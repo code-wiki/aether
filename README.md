@@ -1,198 +1,169 @@
+<div align="center">
+
 # Aether
 
-> **Next-generation AI chatbot desktop application** with multi-provider support, local-first storage, and beautiful minimalistic design.
+**Privacy-first multi-provider AI desktop client**
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
+[![GitHub release](https://img.shields.io/github/v/release/code-wiki/aether?style=flat-square)](https://github.com/code-wiki/aether/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Electron](https://img.shields.io/badge/Electron-28.2-47848F?style=flat-square&logo=electron)](https://www.electronjs.org/)
+[![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
 
-## ✨ Highlights
+[Download](https://github.com/code-wiki/aether/releases) • [Documentation](./QUICKSTART.md) • [Report Bug](https://github.com/code-wiki/aether/issues)
 
-**Aether** is a powerful desktop AI chatbot that combines the best of multiple AI providers (Gemini, Claude, OpenAI) in a single, beautiful, privacy-focused application.
-
-### Why Aether?
-
-- 🌐 **Multi-Provider**: Switch between Gemini, Claude, and OpenAI seamlessly
-- 🔒 **Privacy-First**: All data stored locally, never leaves your computer
-- 💰 **FREE to Start**: Use Gemini via GCP free tier credits
-- 🎨 **Beautiful UI**: Linear.app-inspired design with premium animations
-- ⚡ **Real-Time Streaming**: See AI responses appear as they're generated
-- 🔍 **Full-Text Search**: Find any conversation or message instantly
-- 📤 **Export Anywhere**: Export to Markdown, HTML, Text, or JSON
-- 🎭 **Custom Personas**: Create AI personalities for different tasks
-- 📎 **File Attachments**: Upload images, PDFs, and documents
-- 🌓 **Dark Mode**: Beautiful light and dark themes
-
-### Design Philosophy
-
-Aether's interface draws inspiration from [Linear.app](https://linear.app)'s refined design system:
-
-- **Subtle Motion**: Spring-based animations that feel natural and responsive
-- **Premium Glows**: Accent-colored shadows and focus states for depth
-- **Refined Typography**: Optimized font sizes and letter spacing for readability
-- **Micro-interactions**: Delightful hover states and transitions throughout
-- **Accessible First**: Keyboard navigation, ARIA labels, and reduced motion support
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Node.js** 18+ and **npm** 9+
-- **GCP Account** (for free Gemini) OR **OpenAI API key**
-
-### Installation
-
-```bash
-# Navigate to the aether directory
-cd aether
-
-# Install dependencies (already done if you cloned)
-npm install
-
-# Start development mode
-npm run dev
-```
-
-### First-Time Setup
-
-1. **Using Gemini (FREE)**:
-   - Create a GCP project at https://console.cloud.google.com
-   - Enable Vertex AI API
-   - Run: `gcloud auth application-default login`
-   - In Aether Settings: Enter your Project ID
-   - Start chatting for free!
-
-2. **Using OpenAI**:
-   - Get API key from https://platform.openai.com/api-keys
-   - In Aether Settings: Paste your API key
-   - Start chatting with GPT models
-
-See [QUICKSTART.md](./QUICKSTART.md) for detailed setup instructions.
-
-## 📋 Features
-
-### Core Features
-- ✅ **Multi-Provider AI** - Gemini, Claude (via Vertex AI), OpenAI
-- ✅ **Real-Time Streaming** - Watch responses appear live
-- ✅ **Local Storage** - IndexedDB for offline-first experience
-- ✅ **Full-Text Search** - Search across all conversations
-- ✅ **Export Options** - Markdown, HTML, Text, JSON
-- ✅ **File Attachments** - Images, PDFs, text files
-- ✅ **Code Highlighting** - Beautiful syntax highlighting with copy
-- ✅ **Keyboard Shortcuts** - Power user features
-- ✅ **Light/Dark Themes** - Automatic or manual toggle
-
-### Advanced Features
-- ✅ **Custom Personas** - Create AI personalities with system prompts
-- ✅ **Usage Analytics** - Track conversations, tokens, and costs
-- ✅ **Import/Export** - Backup and restore all conversations
-- ✅ **Conversation Management** - Organize and delete old chats
-- ✅ **Error Handling** - Graceful error recovery
-- ✅ **Toast Notifications** - Non-intrusive feedback
-- ✅ **Accessibility** - Keyboard navigation and ARIA labels
-
-## 🎯 Comparison
-
-| Feature | Aether | ChatGPT Desktop | Claude Desktop |
-|---------|--------|-----------------|----------------|
-| Multi-Provider | ✅ 3 providers | ❌ OpenAI only | ❌ Claude only |
-| Local Storage | ✅ IndexedDB | ❌ Cloud-based | ❌ Cloud-based |
-| Free Tier | ✅ Gemini via GCP | ❌ Limited | ❌ Limited |
-| Export Formats | ✅ 4 formats | ⚠️ Limited | ⚠️ Limited |
-| Custom Personas | ✅ Unlimited | ⚠️ Limited | ⚠️ Via Projects |
-| Offline Search | ✅ Full-text | ❌ Online only | ❌ Online only |
-| File Attachments | ✅ Multiple types | ✅ Images | ✅ Limited |
-| Open Source | ✅ Possible | ❌ Closed | ❌ Closed |
-
-## 🛠️ Tech Stack
-
-- **Desktop**: Electron 28.2.0
-- **Frontend**: React 18.2.0, Vite 5.1.0
-- **Styling**: TailwindCSS 3.4.1
-- **Storage**: IndexedDB (idb 7.1.1)
-- **AI SDKs**:
-  - @google-cloud/vertexai 1.1.0
-  - openai 4.28.0
-- **Markdown**: react-markdown, remark-gfm, rehype-highlight
-- **Animations**: framer-motion 11.0.3
-
-## ⌨️ Keyboard Shortcuts
-
-- `Cmd/Ctrl + N` - New conversation
-- `Cmd/Ctrl + K` - Focus search
-- `Cmd/Ctrl + ,` - Open settings (macOS)
-- `Cmd/Ctrl + Shift + T` - Toggle theme
-- `Enter` - Send message
-- `Shift + Enter` - New line
-- `Esc` - Clear input / Cancel
-
-## 📖 Documentation
-
-- [**QUICKSTART.md**](./QUICKSTART.md) - Detailed setup guide
-- [**FEATURES.md**](./FEATURES.md) - Complete feature list
-- [**KEYBOARD_SHORTCUTS.md**](./KEYBOARD_SHORTCUTS.md) - All keyboard shortcuts
-- [**CONTRIBUTING.md**](./CONTRIBUTING.md) - Contributing guidelines
-- [**docs/guides/**](./docs/guides/) - Architecture, design system, and build guides
-- [**docs/fixes/**](./docs/fixes/) - Historical bug fixes and solutions
-
-## 🏗️ Project Structure
-
-```
-aether/
-├── electron/               # Electron main process
-│   ├── main.js            # Window management, IPC
-│   ├── preload.js         # Secure bridge
-│   └── menu.js            # Application menu
-├── src/                   # React application
-│   ├── components/        # UI components
-│   │   ├── Chat/          # Chat interface
-│   │   ├── Sidebar/       # Navigation
-│   │   ├── Settings/      # Configuration
-│   │   └── UI/            # Reusable components
-│   ├── context/           # React Context
-│   ├── services/          # Business logic
-│   │   ├── ai/            # AI providers
-│   │   └── storage/       # IndexedDB
-│   └── hooks/             # Custom hooks
-└── public/                # Static assets
-```
-
-## 🔧 Building
-
-### Development
-```bash
-npm run dev
-```
-
-### Production Build
-```bash
-# Build for your platform
-npm run build:mac      # macOS (.dmg)
-npm run build:win      # Windows (.exe)
-npm run build:linux    # Linux (.AppImage)
-```
-
-## 🤝 Contributing
-
-This is currently a personal project. Feel free to fork and customize!
-
-## 📄 License
-
-MIT License - See LICENSE file for details
-
-## 🙏 Acknowledgments
-
-- Built with [Electron](https://www.electronjs.org/)
-- Powered by [React](https://react.dev/)
-- Styled with [Tailwind CSS](https://tailwindcss.com/)
-- AI provided by Google (Gemini), Anthropic (Claude), and OpenAI
-
-## 📧 Support
-
-For issues or questions, check the documentation or create an issue.
+</div>
 
 ---
 
-**Built with ❤️ using Electron + React**
+## Overview
 
-*Aether - Invisible, yet omnipresent intelligence*
+Aether is a native desktop application that provides a unified interface for multiple AI providers with complete data privacy. Built for professionals who value control, performance, and design.
+
+**Why Aether exists:**
+
+I built this because existing AI chat applications don't respect your privacy or give you real choice. Your conversations are too valuable to live on someone else's server, and you shouldn't be locked into a single AI provider.
+
+Aether keeps everything local, lets you switch between the best AI models (Gemini, Claude, OpenAI), and gets out of your way with a clean, focused interface.
+
+---
+
+## Quick Start
+
+### Installation
+
+**macOS / Windows / Linux**
+```bash
+# Download the latest release
+# https://github.com/code-wiki/aether/releases
+
+# Or build from source
+git clone https://github.com/code-wiki/aether.git
+cd aether
+npm install
+npm run dev
+```
+
+### Configuration
+
+**Option 1: Gemini (Free via GCP)**
+```bash
+gcloud auth application-default login
+# Add your GCP Project ID in Settings → Providers
+```
+
+**Option 2: OpenAI**
+```
+Add your API key in Settings → Providers
+```
+
+Full setup guide: [`QUICKSTART.md`](./QUICKSTART.md)
+
+---
+
+## What You Get
+
+**Three AI providers in one place**
+- Gemini (with free GCP tier)
+- Claude 3.5 Sonnet
+- OpenAI GPT-4 and GPT-3.5
+
+Switch between them instantly, or use different models for different tasks.
+
+**Complete privacy**
+- Everything stored locally using IndexedDB
+- No cloud syncing, no telemetry, no tracking
+- Works offline with full conversation search
+
+**Built for daily use**
+- Streaming responses so you see answers as they come in
+- Attach files — images, PDFs, documents
+- Export conversations to Markdown, HTML, or JSON
+- Create custom AI personas for different workflows
+- Keyboard shortcuts for everything
+- Dark mode that syncs with your system
+
+---
+
+## Packages
+
+### npm
+
+```bash
+npm install aether
+```
+
+### Desktop Releases
+
+Platform-specific builds available on [GitHub Releases](https://github.com/code-wiki/aether/releases):
+
+| Platform | Package | Architecture |
+|----------|---------|--------------|
+| **macOS** | `.dmg` | Intel + Apple Silicon (Universal) |
+| **Windows** | `.exe` | x64 |
+| **Linux** | `.AppImage` | x64 |
+
+**Build commands:**
+```bash
+npm run build:mac     # macOS DMG
+npm run build:win     # Windows Installer
+npm run build:linux   # Linux AppImage
+npm run build:all     # All platforms
+```
+
+---
+
+## Architecture
+
+```
+electron/          Main process & IPC handlers
+src/
+  ├─ components/   React UI components
+  ├─ services/     AI providers & storage layer
+  ├─ context/      Application state
+  └─ hooks/        Custom React hooks
+```
+
+**Key technologies:**
+- Electron 28.2 — native desktop runtime
+- React 18.2 + Vite — modern frontend tooling
+- Tailwind CSS 3.4 — utility-first styling
+- IndexedDB — persistent local storage
+- Framer Motion — spring-based animations
+
+---
+
+## Development
+
+```bash
+npm run dev              # Start development server
+npm run build            # Build for production
+npm run pack             # Create distributable package
+npm run release          # Build and publish release
+
+npm run lint             # Run ESLint
+npm run format           # Format with Prettier
+npm run test             # Run test suite
+```
+
+---
+
+## Documentation
+
+- [`QUICKSTART.md`](./QUICKSTART.md) — Setup guide
+- [`FEATURES.md`](./FEATURES.md) — Detailed feature list
+- [`KEYBOARD_SHORTCUTS.md`](./KEYBOARD_SHORTCUTS.md) — Hotkey reference
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md) — Development guidelines
+
+---
+
+## License
+
+MIT © 2024 Aether
+
+---
+
+<div align="center">
+
+**[↑ Back to top](#aether)**
+
+</div>
