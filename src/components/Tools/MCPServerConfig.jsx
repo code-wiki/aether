@@ -227,14 +227,14 @@ function MCPServerConfig({ onClose, onInstall, initialServer }) {
               </div>
 
               {/* Info Box */}
-              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="mt-6 p-4 bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-purple-800 rounded-lg">
                 <div className="flex items-start gap-3">
-                  <Plug className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <Plug className="w-5 h-5 text-pink-600 dark:text-pink-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1">
+                    <h4 className="font-medium text-pink-900 dark:text-pink-100 mb-1">
                       What are MCP Servers?
                     </h4>
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <p className="text-sm text-pink-800 dark:text-pink-200">
                       Model Context Protocol (MCP) servers extend AI capabilities by providing access to external tools, APIs, databases, and data sources. Install servers to give your agents new abilities.
                     </p>
                   </div>

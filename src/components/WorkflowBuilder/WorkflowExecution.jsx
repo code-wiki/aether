@@ -135,7 +135,7 @@ function WorkflowExecution({ workflow, onBack, onExecute }) {
             <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
               Run Workflow
             </h2>
-            <p className="text-base font-medium text-cyan-600 dark:text-cyan-400">
+            <p className="text-base font-medium text-orange-600 dark:text-orange-400">
               {workflow.name}
             </p>
           </div>
@@ -159,14 +159,14 @@ function WorkflowExecution({ workflow, onBack, onExecute }) {
 
         {/* Workflow Description */}
         {workflow.description && (
-          <div className="ml-14 p-4 bg-cyan-50 dark:bg-cyan-950/30 rounded-lg border border-cyan-200 dark:border-cyan-800">
+          <div className="ml-14 p-4 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800">
             <div className="flex items-start gap-2">
-              <HiDocument className="w-4 h-4 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
+              <HiDocument className="w-4 h-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm text-cyan-900 dark:text-cyan-100 font-medium mb-1">
+                <p className="text-sm text-orange-900 dark:text-orange-100 font-medium mb-1">
                   Workflow Description
                 </p>
-                <p className="text-sm text-cyan-700 dark:text-cyan-300">
+                <p className="text-sm text-orange-700 dark:text-orange-300">
                   {workflow.description}
                 </p>
               </div>
@@ -255,19 +255,19 @@ function WorkflowExecution({ workflow, onBack, onExecute }) {
 
             {/* Workflow Info Cards */}
             <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mt-8">
-              <div className="p-4 bg-cyan-50 dark:bg-cyan-950/30 rounded-xl border border-cyan-200 dark:border-cyan-800 text-left">
-                <div className="text-xs font-medium text-cyan-700 dark:text-cyan-400 uppercase tracking-wider mb-1">
+              <div className="p-4 bg-orange-50 dark:bg-orange-950/30 rounded-xl border border-orange-200 dark:border-orange-800 text-left">
+                <div className="text-xs font-medium text-orange-700 dark:text-orange-400 uppercase tracking-wider mb-1">
                   Nodes
                 </div>
-                <div className="text-2xl font-bold text-cyan-900 dark:text-cyan-100">
+                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
                   {workflow.nodes?.length || 0}
                 </div>
               </div>
-              <div className="p-4 bg-cyan-50 dark:bg-cyan-950/30 rounded-xl border border-cyan-200 dark:border-cyan-800 text-left">
-                <div className="text-xs font-medium text-cyan-700 dark:text-cyan-400 uppercase tracking-wider mb-1">
+              <div className="p-4 bg-orange-50 dark:bg-orange-950/30 rounded-xl border border-orange-200 dark:border-orange-800 text-left">
+                <div className="text-xs font-medium text-orange-700 dark:text-orange-400 uppercase tracking-wider mb-1">
                   Connections
                 </div>
-                <div className="text-2xl font-bold text-cyan-900 dark:text-cyan-100">
+                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
                   {workflow.edges?.length || 0}
                 </div>
               </div>
@@ -278,7 +278,7 @@ function WorkflowExecution({ workflow, onBack, onExecute }) {
         {/* Execution Progress */}
         {executionStatus && executionStatus.status === 'running' && (
           <div className="max-w-2xl mx-auto">
-            <div className="p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <div className="p-6 bg-gradient-to-br from-green-50 to-purple-50 dark:from-green-950/20 dark:to-purple-950/20 border border-green-200 dark:border-green-800 rounded-lg">
               <div className="flex items-start gap-4">
                 <Loader2 className="w-6 h-6 text-green-600 dark:text-green-400 animate-spin flex-shrink-0 mt-1" />
                 <div className="flex-1">

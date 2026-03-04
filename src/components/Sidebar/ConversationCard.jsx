@@ -66,13 +66,13 @@ const ConversationCard = memo(({
       className={cn(
         "w-full p-2.5 rounded-md transition-colors text-left group relative cursor-pointer",
         isActive
-          ? "bg-blue-50 dark:bg-blue-950/30 border-l-2 border-blue-500"
+          ? "bg-pink-50 dark:bg-pink-950/30 border-l-2 border-pink-500"
           : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
       )}
     >
       <div className="flex items-start gap-2">
         {/* Icon */}
-        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center flex-shrink-0">
           <HiChatBubbleLeftRight className="w-4 h-4 text-white" />
         </div>
 

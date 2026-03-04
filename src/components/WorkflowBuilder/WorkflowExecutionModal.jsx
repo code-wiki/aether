@@ -102,7 +102,7 @@ function WorkflowExecutionModal({ workflow, onClose, onExecute }) {
 
                   {node.data.type === 'file' ? (
                     <div>
-                      <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-lg hover:border-cyan-500 dark:hover:border-cyan-500 transition-colors cursor-pointer">
+                      <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-lg hover:border-orange-500 dark:hover:border-orange-500 transition-colors cursor-pointer">
                         <input
                           type="file"
                           onChange={(e) => handleFileChange(node.data.name, e)}
@@ -120,14 +120,14 @@ function WorkflowExecutionModal({ workflow, onClose, onExecute }) {
                       type="number"
                       value={inputs[node.data.name] || ''}
                       onChange={(e) => setInputs({ ...inputs, [node.data.name]: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                       placeholder={`Enter ${node.data.label || node.data.name}`}
                     />
                   ) : node.data.type === 'boolean' ? (
                     <select
                       value={inputs[node.data.name] || 'true'}
                       onChange={(e) => setInputs({ ...inputs, [node.data.name]: e.target.value === 'true' })}
-                      className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="true">True</option>
                       <option value="false">False</option>
@@ -137,7 +137,7 @@ function WorkflowExecutionModal({ workflow, onClose, onExecute }) {
                       value={inputs[node.data.name] || ''}
                       onChange={(e) => setInputs({ ...inputs, [node.data.name]: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
+                      className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
                       placeholder={`Enter ${node.data.label || node.data.name}`}
                     />
                   )}
@@ -150,7 +150,7 @@ function WorkflowExecutionModal({ workflow, onClose, onExecute }) {
           {executionStatus && executionStatus.status === 'running' && (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <Loader2 className="w-5 h-5 text-cyan-500 animate-spin" />
+                <Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
                 <div>
                   <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                     Executing Workflow...

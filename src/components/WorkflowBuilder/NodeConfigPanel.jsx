@@ -209,11 +209,11 @@ function NodeConfigPanel({ node, onUpdate, onClose }) {
             </div>
 
             {config.agentId && (
-              <div className="p-3 bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-800 rounded-lg">
-                <div className="text-xs font-medium text-cyan-900 dark:text-cyan-100 mb-1">
+              <div className="p-3 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-lg">
+                <div className="text-xs font-medium text-orange-900 dark:text-orange-100 mb-1">
                   Selected: {config.agentName}
                 </div>
-                <div className="text-xs text-cyan-700 dark:text-cyan-300">
+                <div className="text-xs text-orange-700 dark:text-orange-300">
                   Model: {config.agentModel}
                 </div>
               </div>

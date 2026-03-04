@@ -14,8 +14,8 @@ function WorkflowLibrary({ onLoad, onClose }) {
       name: 'Blog Post Creator',
       description: 'Research topic → Create outline → Write content → Generate cover image',
       icon: FileText,
-      color: 'text-blue-600',
-      bg: 'bg-blue-100',
+      color: 'text-pink-600',
+      bg: 'bg-pink-100',
     },
     {
       id: 'data-analyzer',

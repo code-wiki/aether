@@ -52,10 +52,10 @@ function GCPAuthModal({ isOpen, onClose, onAuthSuccess, authStatus }) {
 
   const openTerminal = () => {
     // Open terminal with the auth command pre-filled (platform-specific)
-    if (process.platform === 'darwin') {
+    if (window.electron.isMac) {
       // macOS - open Terminal.app
       window.electron.shell.exec(`osascript -e 'tell application "Terminal" to do script "gcloud auth application-default login"'`);
-    } else if (process.platform === 'win32') {
+    } else if (window.electron.isWindows) {
       // Windows - open cmd
       window.electron.shell.exec('start cmd.exe /K "gcloud auth application-default login"');
     } else {
@@ -113,7 +113,7 @@ function GCPAuthModal({ isOpen, onClose, onAuthSuccess, authStatus }) {
               <div className="space-y-4">
                 {instructions.steps.map((step) => (
                   <div key={step.number} className="flex gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full font-semibold text-sm">
+                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-full font-semibold text-sm">
                       {step.number}
                     </div>
                     <div className="flex-1">
@@ -145,19 +145,19 @@ function GCPAuthModal({ isOpen, onClose, onAuthSuccess, authStatus }) {
               </div>
 
               {/* Quick Action: Open Terminal */}
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+              <div className="p-4 bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-purple-800 rounded-xl">
                 <div className="flex items-start gap-3">
-                  <Terminal className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <Terminal className="w-5 h-5 text-pink-600 dark:text-pink-400 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    <p className="font-medium text-blue-900 dark:text-blue-100">
+                    <p className="font-medium text-pink-900 dark:text-pink-100">
                       Quick Action
                     </p>
-                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                    <p className="text-sm text-purple-700 dark:text-pink-300 mt-1">
                       Click the button below to open your terminal with the command ready to run.
                     </p>
                     <button
                       onClick={openTerminal}
-                      className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
+                      className="mt-3 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
                     >
                       <Terminal className="w-4 h-4" />
                       Open Terminal & Authenticate
@@ -178,7 +178,7 @@ function GCPAuthModal({ isOpen, onClose, onAuthSuccess, authStatus }) {
                   href="https://cloud.google.com/iam/docs/service-accounts-create"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  className="mt-2 inline-flex items-center gap-1 text-sm text-pink-600 dark:text-pink-400 hover:underline"
                 >
                   Learn about service accounts
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -241,7 +241,7 @@ function GCPAuthModal({ isOpen, onClose, onAuthSuccess, authStatus }) {
                 onClick={handleTestAuth}
                 disabled={testing}
                 className={cn(
-                  'px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2',
+                  'px-6 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2',
                   testing && 'opacity-50 cursor-not-allowed'
                 )}
               >

@@ -179,7 +179,7 @@ const MessageContent = memo(({
             'rounded-full flex items-center justify-center',
             isMobile ? 'w-8 h-8' : 'w-9 h-9 md:w-10 md:h-10',
             isUser
-              ? 'bg-blue-500 text-white'
+              ? 'bg-pink-500 text-white'
               : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
           )}
         >
@@ -236,7 +236,7 @@ const MessageContent = memo(({
             'max-w-[90%] md:max-w-[85%]',
             isMobile ? 'px-3 py-2 rounded-xl' : 'px-4 py-3 rounded-xl md:rounded-2xl',
             // User message styling
-            isUser && 'bg-blue-500 text-white rounded-tr-sm shadow-blue-500/10',
+            isUser && 'bg-pink-500 text-white rounded-tr-sm shadow-blue-500/10',
             // AI message styling - Linear.app inspired with subtle gradient
             !isUser && 'bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-900 dark:to-neutral-800 text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-800 rounded-tl-sm'
           )}
@@ -265,8 +265,8 @@ const MessageContent = memo(({
                   // Linear-style prose
                   'prose-headings:font-semibold prose-headings:tracking-tight',
                   'prose-p:text-neutral-700 dark:prose-p:text-neutral-300',
-                  'prose-a:text-blue-600 dark:prose-a:text-blue-400',
-                  'prose-code:text-blue-700 dark:prose-code:text-blue-300',
+                  'prose-a:text-pink-600 dark:prose-a:text-pink-400',
+                  'prose-code:text-purple-700 dark:prose-code:text-purple-300',
                   'prose-code:bg-neutral-200 dark:prose-code:bg-neutral-800',
                   'prose-code:px-1 prose-code:py-0.5 prose-code:rounded',
                   'prose-pre:bg-neutral-900 prose-pre:text-neutral-0',

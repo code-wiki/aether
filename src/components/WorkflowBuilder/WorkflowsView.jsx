@@ -150,7 +150,7 @@ function WorkflowsView({ isMobile, isTablet, selectedWorkflow, onWorkflowChange,
                     </button>
                     <button
                       onClick={(e) => handleEdit(selectedWorkflow, e)}
-                      className="px-3 py-1.5 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center gap-1.5 text-sm font-medium"
+                      className="px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-1.5 text-sm font-medium"
                     >
                       <HiCog6Tooth className="w-4 h-4" />
                       Edit
@@ -204,30 +204,30 @@ function WorkflowsView({ isMobile, isTablet, selectedWorkflow, onWorkflowChange,
                     Workflow Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 rounded-xl border border-cyan-200 dark:border-cyan-800">
-                      <div className="text-xs font-medium text-cyan-700 dark:text-cyan-400 uppercase tracking-wider mb-2">
+                    <div className="p-4 bg-gradient-to-br from-pink-50 to-purple-100 dark:from-pink-950/30 dark:to-purple-900/30 rounded-xl border border-orange-200 dark:border-orange-800">
+                      <div className="text-xs font-medium text-orange-700 dark:text-orange-400 uppercase tracking-wider mb-2">
                         Nodes
                       </div>
-                      <div className="text-2xl font-bold text-cyan-900 dark:text-cyan-100">
+                      <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
                         {selectedWorkflow.nodes?.length || 0}
                       </div>
-                      <div className="text-xs text-cyan-600 dark:text-cyan-400 mt-1">
+                      <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
                         Processing steps
                       </div>
                     </div>
 
-                    <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 rounded-xl border border-cyan-200 dark:border-cyan-800">
-                      <div className="text-xs font-medium text-cyan-700 dark:text-cyan-400 uppercase tracking-wider mb-2">
+                    <div className="p-4 bg-gradient-to-br from-pink-50 to-purple-100 dark:from-pink-950/30 dark:to-purple-900/30 rounded-xl border border-orange-200 dark:border-orange-800">
+                      <div className="text-xs font-medium text-orange-700 dark:text-orange-400 uppercase tracking-wider mb-2">
                         Created
                       </div>
-                      <div className="text-lg font-bold text-cyan-900 dark:text-cyan-100">
+                      <div className="text-lg font-bold text-orange-900 dark:text-orange-100">
                         {new Date(selectedWorkflow.createdAt).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric'
                         })}
                       </div>
-                      <div className="text-xs text-cyan-600 dark:text-cyan-400 mt-1">
+                      <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
                         {Math.floor((Date.now() - selectedWorkflow.createdAt) / (1000 * 60 * 60 * 24))} days ago
                       </div>
                     </div>
@@ -280,8 +280,8 @@ function WorkflowsView({ isMobile, isTablet, selectedWorkflow, onWorkflowChange,
         ) : (
           <div className="flex-1 flex items-center justify-center p-6">
             <div className="max-w-2xl mx-auto text-center">
-              <div className="w-32 h-32 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-blue-500/10 to-blue-600/10 dark:from-blue-500/20 dark:to-blue-600/20 flex items-center justify-center border border-cyan-200 dark:border-cyan-800">
-                <HiCog6Tooth className="w-16 h-16 text-cyan-500" />
+              <div className="w-32 h-32 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-pink-500/10 to-purple-600/10 dark:from-pink-500/20 dark:to-purple-600/20 flex items-center justify-center border border-orange-200 dark:border-orange-800">
+                <HiCog6Tooth className="w-16 h-16 text-orange-500" />
               </div>
 
               <h3 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mb-3">
@@ -293,8 +293,8 @@ function WorkflowsView({ isMobile, isTablet, selectedWorkflow, onWorkflowChange,
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 text-left">
-                <div className="p-4 bg-cyan-50 dark:bg-cyan-950/30 rounded-xl border border-cyan-200 dark:border-cyan-800">
-                  <div className="w-10 h-10 mb-3 rounded-lg bg-cyan-500 flex items-center justify-center">
+                <div className="p-4 bg-orange-50 dark:bg-orange-950/30 rounded-xl border border-orange-200 dark:border-orange-800">
+                  <div className="w-10 h-10 mb-3 rounded-lg bg-orange-500 flex items-center justify-center">
                     <HiPlay className="w-5 h-5 text-white" />
                   </div>
                   <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
@@ -305,8 +305,8 @@ function WorkflowsView({ isMobile, isTablet, selectedWorkflow, onWorkflowChange,
                   </p>
                 </div>
 
-                <div className="p-4 bg-cyan-50 dark:bg-cyan-950/30 rounded-xl border border-cyan-200 dark:border-cyan-800">
-                  <div className="w-10 h-10 mb-3 rounded-lg bg-cyan-500 flex items-center justify-center">
+                <div className="p-4 bg-orange-50 dark:bg-orange-950/30 rounded-xl border border-orange-200 dark:border-orange-800">
+                  <div className="w-10 h-10 mb-3 rounded-lg bg-orange-500 flex items-center justify-center">
                     <HiCog6Tooth className="w-5 h-5 text-white" />
                   </div>
                   <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
@@ -317,8 +317,8 @@ function WorkflowsView({ isMobile, isTablet, selectedWorkflow, onWorkflowChange,
                   </p>
                 </div>
 
-                <div className="p-4 bg-cyan-50 dark:bg-cyan-950/30 rounded-xl border border-cyan-200 dark:border-cyan-800">
-                  <div className="w-10 h-10 mb-3 rounded-lg bg-cyan-500 flex items-center justify-center">
+                <div className="p-4 bg-orange-50 dark:bg-orange-950/30 rounded-xl border border-orange-200 dark:border-orange-800">
+                  <div className="w-10 h-10 mb-3 rounded-lg bg-orange-500 flex items-center justify-center">
                     <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>

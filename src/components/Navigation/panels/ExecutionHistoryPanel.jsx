@@ -52,7 +52,7 @@ function ExecutionHistoryPanel({ selectedWorkflow, executions, onExecutionClick,
       case 'failed':
         return <HiXCircle className="w-4 h-4 text-red-600 dark:text-red-400" />;
       case 'running':
-        return <HiArrowPath className="w-4 h-4 text-cyan-600 dark:text-cyan-400 animate-spin" />;
+        return <HiArrowPath className="w-4 h-4 text-orange-600 dark:text-orange-400 animate-spin" />;
       default:
         return <HiClock className="w-4 h-4 text-neutral-400" />;
     }
@@ -90,7 +90,7 @@ function ExecutionHistoryPanel({ selectedWorkflow, executions, onExecutionClick,
                 ? 'bg-green-100 dark:bg-green-950/30'
                 : exec.status === 'failed'
                 ? 'bg-red-100 dark:bg-red-950/30'
-                : 'bg-cyan-100 dark:bg-cyan-950/30'
+                : 'bg-orange-100 dark:bg-orange-950/30'
             )}
             title={`Execution ${formatTime(exec.startedAt)}`}
           >
@@ -154,8 +154,8 @@ function ExecutionHistoryPanel({ selectedWorkflow, executions, onExecutionClick,
                 </div>
 
                 {/* Input description to differentiate executions */}
-                <div className="mb-2 p-2 bg-cyan-50 dark:bg-cyan-950/30 rounded border border-cyan-200 dark:border-cyan-800">
-                  <div className="text-xs text-cyan-900 dark:text-cyan-100 font-medium truncate">
+                <div className="mb-2 p-2 bg-orange-50 dark:bg-orange-950/30 rounded border border-orange-200 dark:border-orange-800">
+                  <div className="text-xs text-orange-900 dark:text-orange-100 font-medium truncate">
                     {getExecutionDescription(exec)}
                   </div>
                 </div>

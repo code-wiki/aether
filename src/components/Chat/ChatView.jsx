@@ -39,10 +39,10 @@ const ChatView = ({ isMobile, isTablet }) => {
             className="mb-6 md:mb-8 flex justify-center"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full" />
-              <div className="relative p-6 md:p-8 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 rounded-2xl md:rounded-3xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-purple-500/20 blur-3xl rounded-full" />
+              <div className="relative p-6 md:p-8 bg-gradient-to-br from-pink-50 via-purple-50 to-purple-50 dark:from-pink-900/20 dark:via-purple-900/20 dark:to-purple-900/20 rounded-2xl md:rounded-3xl">
                 <MessageSquare className={cn(
-                  "text-blue-500",
+                  "text-pink-500",
                   isMobile ? "w-14 h-14" : "w-20 h-20"
                 )} strokeWidth={1.5} />
               </div>
@@ -104,7 +104,7 @@ const ChatView = ({ isMobile, isTablet }) => {
       )}>
         <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
           <Sparkles className={cn(
-            "text-blue-500 flex-shrink-0",
+            "text-pink-500 flex-shrink-0",
             isMobile ? "w-4 h-4" : "w-5 h-5"
           )} />
           <div className="flex-1 min-w-0">

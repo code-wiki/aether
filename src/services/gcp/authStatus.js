@@ -3,20 +3,21 @@
  * Checks if Application Default Credentials are expired and need refresh
  */
 
-import { homedir } from 'os';
-import path from 'path';
-
 /**
  * Get the path to Application Default Credentials file
  */
-function getADCPath() {
-  const homeDir = homedir();
+async function getADCPath() {
+  const homeDir = await window.electron.os.homedir();
+  const platform = await window.electron.os.platform();
 
-  if (process.platform === 'win32') {
-    return path.join(process.env.APPDATA || '', 'gcloud', 'application_default_credentials.json');
+  if (platform === 'win32') {
+    // Windows: %APPDATA%\gcloud\application_default_credentials.json
+    const appData = await window.electron.app.getPath('appData');
+    return `${appData}\\gcloud\\application_default_credentials.json`;
   }
 
-  return path.join(homeDir, '.config', 'gcloud', 'application_default_credentials.json');
+  // macOS/Linux: ~/.config/gcloud/application_default_credentials.json
+  return `${homeDir}/.config/gcloud/application_default_credentials.json`;
 }
 
 /**
@@ -25,7 +26,7 @@ function getADCPath() {
  */
 export async function checkAuthStatus() {
   try {
-    const adcPath = getADCPath();
+    const adcPath = await getADCPath();
 
     // Check if file exists
     const exists = await window.electron.fs.exists(adcPath);

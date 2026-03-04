@@ -31,7 +31,7 @@ function MessageBubble({ message, isMobile }) {
           // Responsive padding
           isMobile ? 'px-3 py-2' : 'px-4 py-3',
           // User message styling
-          isUser && 'bg-blue-500 text-white shadow-sm shadow-blue-500/20',
+          isUser && 'bg-pink-500 text-white shadow-sm shadow-blue-500/20',
           // AI message styling - Linear.app inspired subtle background
           !isUser && 'bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-800'
         )}
@@ -53,8 +53,8 @@ function MessageBubble({ message, isMobile }) {
               // Linear-style prose refinements
               'prose-headings:font-semibold prose-headings:tracking-tight',
               'prose-p:text-neutral-700 dark:prose-p:text-neutral-300',
-              'prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline',
-              'prose-code:text-blue-700 dark:prose-code:text-blue-300 prose-code:bg-neutral-100 dark:prose-code:bg-neutral-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded',
+              'prose-a:text-pink-600 dark:prose-a:text-pink-400 prose-a:no-underline hover:prose-a:underline',
+              'prose-code:text-purple-700 dark:prose-code:text-purple-300 prose-code:bg-neutral-100 dark:prose-code:bg-neutral-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded',
               'prose-pre:bg-neutral-900 dark:prose-pre:bg-neutral-950 prose-pre:border prose-pre:border-neutral-800'
             )}
             components={{

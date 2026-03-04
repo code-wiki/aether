@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '../../../lib/utils';
 import { HiBeaker, HiSparkles, HiMagnifyingGlass, HiXMark, HiStar } from 'react-icons/hi2';
 
-function WorkflowsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selectedWorkflow }) {
+function WorkflowsPanel({ isCollapsed, activeColor = 'orange', onOpenItem, selectedWorkflow }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all'); // 'today', 'pinned', 'all'
 
@@ -116,7 +116,7 @@ function WorkflowsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selecte
           <button
             key={workflow.id}
             onClick={() => onOpenItem?.(workflow)}
-            className="w-10 h-10 rounded-lg mb-2 bg-gradient-to-br from-cyan-500 to-cyan-600 text-white flex items-center justify-center hover:scale-105 transition-all shadow-lg"
+            className="w-10 h-10 rounded-lg mb-2 bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center hover:scale-105 transition-all shadow-lg"
             title={workflow.name}
           >
             <HiBeaker className="w-5 h-5" />
@@ -136,7 +136,7 @@ function WorkflowsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selecte
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search workflows..."
-          className="w-full pl-8 pr-8 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-cyan-500 text-sm placeholder:text-neutral-400"
+          className="w-full pl-8 pr-8 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-sm placeholder:text-neutral-400"
         />
         {searchQuery && (
           <button
@@ -155,7 +155,7 @@ function WorkflowsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selecte
           className={cn(
             'px-2.5 py-1 rounded text-xs font-medium transition-colors',
             activeTab === 'all'
-              ? 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-600 dark:text-cyan-400'
+              ? 'bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400'
               : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
@@ -166,7 +166,7 @@ function WorkflowsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selecte
           className={cn(
             'px-2.5 py-1 rounded text-xs font-medium transition-colors',
             activeTab === 'today'
-              ? 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-600 dark:text-cyan-400'
+              ? 'bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400'
               : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
@@ -177,7 +177,7 @@ function WorkflowsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selecte
           className={cn(
             'px-2.5 py-1 rounded text-xs font-medium transition-colors',
             activeTab === 'pinned'
-              ? 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-600 dark:text-cyan-400'
+              ? 'bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400'
               : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
@@ -194,12 +194,12 @@ function WorkflowsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selecte
             className={cn(
               "w-full p-2.5 rounded-md transition-colors text-left group",
               selectedWorkflow?.id === workflow.id
-                ? "bg-cyan-50 dark:bg-cyan-950/30 border-l-2 border-cyan-500"
+                ? "bg-orange-50 dark:bg-orange-950/30 border-l-2 border-orange-500"
                 : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
             )}
           >
             <div className="flex items-start gap-2">
-              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
                 <HiBeaker className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1 min-w-0">
@@ -234,8 +234,8 @@ function WorkflowsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selecte
 
         {filteredWorkflows.length === 0 && (
           <div className="text-center py-8">
-            <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-cyan-50 dark:bg-cyan-950/30 flex items-center justify-center">
-              <HiBeaker className="w-5 h-5 text-cyan-500" />
+            <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center">
+              <HiBeaker className="w-5 h-5 text-orange-500" />
             </div>
             <p className="text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-0.5">
               {searchQuery ? 'No workflows found' : 'No workflows yet'}

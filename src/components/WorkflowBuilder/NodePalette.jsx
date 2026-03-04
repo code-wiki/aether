@@ -27,16 +27,16 @@ function NodePalette({ onAddNode }) {
       label: 'AI Model',
       icon: Brain,
       description: 'Call an AI model',
-      color: 'text-blue-600 dark:text-blue-400',
-      bg: 'bg-blue-100 dark:bg-blue-900/30',
+      color: 'text-pink-600 dark:text-pink-400',
+      bg: 'bg-pink-100 dark:bg-pink-900/30',
     },
     {
       type: 'tool',
       label: 'Tool',
       icon: Wrench,
       description: 'Execute a tool',
-      color: 'text-cyan-600 dark:text-cyan-400',
-      bg: 'bg-cyan-100 dark:bg-cyan-900/30',
+      color: 'text-orange-600 dark:text-orange-400',
+      bg: 'bg-orange-100 dark:bg-orange-900/30',
     },
     {
       type: 'output',
@@ -81,11 +81,11 @@ function NodePalette({ onAddNode }) {
         })}
       </div>
 
-      <div className="mt-6 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-        <h4 className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-2">
+      <div className="mt-6 p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-purple-800">
+        <h4 className="text-xs font-semibold text-pink-900 dark:text-pink-100 mb-2">
           💡 How to use
         </h4>
-        <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+        <ul className="text-xs text-pink-800 dark:text-pink-200 space-y-1">
           <li>• Click nodes to add them</li>
           <li>• Drag to connect nodes</li>
           <li>• Click a node to configure</li>

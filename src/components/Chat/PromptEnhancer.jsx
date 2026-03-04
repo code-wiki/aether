@@ -42,7 +42,7 @@ function PromptEnhancer({ prompt, onApply, onClose, isMobile }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
         className={cn(
-          'mb-2 p-3 rounded-xl border bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800',
+          'mb-2 p-3 rounded-xl border bg-gradient-to-r from-purple-50 to-purple-50 dark:from-purple-950/20 dark:to-purple-950/20 border-purple-200 dark:border-purple-800',
           isMobile ? 'text-xs' : 'text-sm'
         )}
       >

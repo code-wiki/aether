@@ -3,7 +3,7 @@ import { cn } from '../../../lib/utils';
 import { HiBookOpen, HiDocumentText, HiCircleStack, HiMagnifyingGlass, HiXMark, HiStar } from 'react-icons/hi2';
 import KnowledgeBaseStorage from '../../../services/storage/KnowledgeBaseStorage';
 
-function KnowledgePanel({ isCollapsed, activeColor = 'amber', onOpenItem, selectedKnowledge }) {
+function KnowledgePanel({ isCollapsed, activeColor = 'yellow', onOpenItem, selectedKnowledge }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all'); // 'today', 'pinned', 'all'
   const [knowledgeBases, setKnowledgeBases] = useState([]);
@@ -67,7 +67,7 @@ function KnowledgePanel({ isCollapsed, activeColor = 'amber', onOpenItem, select
           <button
             key={kb.id}
             onClick={() => onOpenItem?.(kb)}
-            className="w-10 h-10 rounded-lg mb-2 bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center hover:scale-105 transition-all shadow-lg"
+            className="w-10 h-10 rounded-lg mb-2 bg-gradient-to-br from-yellow-500 to-yellow-600 text-white flex items-center justify-center hover:scale-105 transition-all shadow-lg"
             title={kb.name}
           >
             <span className="text-lg">{kb.icon}</span>
@@ -87,7 +87,7 @@ function KnowledgePanel({ isCollapsed, activeColor = 'amber', onOpenItem, select
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search knowledge bases..."
-          className="w-full pl-8 pr-8 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm placeholder:text-neutral-400"
+          className="w-full pl-8 pr-8 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 text-sm placeholder:text-neutral-400"
         />
         {searchQuery && (
           <button
@@ -106,7 +106,7 @@ function KnowledgePanel({ isCollapsed, activeColor = 'amber', onOpenItem, select
           className={cn(
             'px-2.5 py-1 rounded text-xs font-medium transition-colors',
             activeTab === 'all'
-              ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400'
+              ? 'bg-yellow-50 dark:bg-yellow-950/30 text-yellow-600 dark:text-yellow-400'
               : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
@@ -117,7 +117,7 @@ function KnowledgePanel({ isCollapsed, activeColor = 'amber', onOpenItem, select
           className={cn(
             'px-2.5 py-1 rounded text-xs font-medium transition-colors',
             activeTab === 'today'
-              ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400'
+              ? 'bg-yellow-50 dark:bg-yellow-950/30 text-yellow-600 dark:text-yellow-400'
               : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
@@ -128,7 +128,7 @@ function KnowledgePanel({ isCollapsed, activeColor = 'amber', onOpenItem, select
           className={cn(
             'px-2.5 py-1 rounded text-xs font-medium transition-colors',
             activeTab === 'pinned'
-              ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400'
+              ? 'bg-yellow-50 dark:bg-yellow-950/30 text-yellow-600 dark:text-yellow-400'
               : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
@@ -145,12 +145,12 @@ function KnowledgePanel({ isCollapsed, activeColor = 'amber', onOpenItem, select
             className={cn(
               "w-full p-2.5 rounded-md transition-colors text-left group",
               selectedKnowledge?.id === kb.id
-                ? "bg-amber-50 dark:bg-amber-950/30 border-l-2 border-amber-500"
+                ? "bg-yellow-50 dark:bg-yellow-950/30 border-l-2 border-yellow-500"
                 : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
             )}
           >
             <div className="flex items-start gap-2">
-              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center flex-shrink-0 text-base">
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center flex-shrink-0 text-base">
                 {kb.icon}
               </div>
               <div className="flex-1 min-w-0">
@@ -188,8 +188,8 @@ function KnowledgePanel({ isCollapsed, activeColor = 'amber', onOpenItem, select
 
         {filteredKBs.length === 0 && (
           <div className="text-center py-8">
-            <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center">
-              <HiBookOpen className="w-5 h-5 text-amber-500" />
+            <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-yellow-50 dark:bg-yellow-950/30 flex items-center justify-center">
+              <HiBookOpen className="w-5 h-5 text-yellow-500" />
             </div>
             <p className="text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-0.5">
               {searchQuery ? 'No knowledge bases found' : 'No knowledge bases'}

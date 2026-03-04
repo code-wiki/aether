@@ -7,7 +7,7 @@ import PanelFilters from './PanelFilters';
 /**
  * ChatPanel - Shows conversation list
  */
-function ChatPanel({ isCollapsed, activeColor = 'blue' }) {
+function ChatPanel({ isCollapsed, activeColor = 'pink' }) {
   const { conversations, activeConversationId, loadConversation, deleteConversation, pinConversation } = useConversation();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all'); // 'today', 'pinned', 'all'
@@ -46,7 +46,7 @@ function ChatPanel({ isCollapsed, activeColor = 'blue' }) {
             className={cn(
               'w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-all',
               conv.id === activeConversationId
-                ? 'bg-blue-500 text-white'
+                ? 'bg-pink-500 text-white'
                 : 'bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700'
             )}
             title={conv.title}
@@ -68,7 +68,7 @@ function ChatPanel({ isCollapsed, activeColor = 'blue' }) {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         searchPlaceholder="Search conversations..."
-        color="blue"
+        color={activeColor}
       />
 
       {/* Conversations */}

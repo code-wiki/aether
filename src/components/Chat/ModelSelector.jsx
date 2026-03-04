@@ -93,7 +93,7 @@ function ModelSelector() {
                       className={`
                         flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all flex flex-col items-center
                         ${currentProvider === provider.id
-                          ? 'bg-blue-500 text-white shadow-md'
+                          ? 'bg-pink-500 text-white shadow-md'
                           : 'bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-700'
                         }
                       `}
@@ -141,7 +141,7 @@ function ModelSelector() {
                     className={`
                       w-full text-left px-3 py-2 rounded-lg transition-all border
                       ${currentModel === model.id
-                        ? 'bg-blue-500 text-white border-blue-600 shadow-sm'
+                        ? 'bg-pink-500 text-white border-pink-600 shadow-sm'
                         : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-900 dark:text-neutral-100 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700'
                       }
                     `}

@@ -443,7 +443,7 @@ function AgentChat({ agent, onBack, sessionId = null, initialMessages = null }) 
 
         {isLoading && !isTyping && (
           <div className="flex justify-start">
-            <div className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-purple-50 to-purple-50 dark:from-purple-950/20 dark:to-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 relative overflow-hidden">
               {/* Shimmer effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent loading-shimmer" />
 
@@ -467,7 +467,7 @@ function AgentChat({ agent, onBack, sessionId = null, initialMessages = null }) 
                   </div>
                   <div className="h-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500 rounded-full"
+                      className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 rounded-full"
                       style={{
                         animation: 'progress 2s ease-in-out infinite',
                         backgroundSize: '200% 100%',

@@ -144,9 +144,9 @@ const MessageStream = ({ messages, isStreaming, isMobile, isTablet }) => {
             scrollToBottom();
           }}
           className={cn(
-            "fixed bg-blue-500/20 dark:bg-blue-500/30 backdrop-blur-sm text-blue-600 dark:text-blue-400",
-            "border border-blue-300 dark:border-blue-600",
-            "rounded-lg shadow-lg hover:bg-blue-500/30 dark:hover:bg-blue-500/40 hover:scale-105 transition-all",
+            "fixed bg-pink-500/20 dark:bg-pink-500/30 backdrop-blur-sm text-pink-600 dark:text-pink-400",
+            "border border-pink-300 dark:border-purple-600",
+            "rounded-lg shadow-lg hover:bg-pink-500/30 dark:hover:bg-pink-500/40 hover:scale-105 transition-all",
             isMobile
               ? "bottom-24 right-4 p-2.5"
               : "bottom-36 right-6 md:right-8 p-3"

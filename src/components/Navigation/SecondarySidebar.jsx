@@ -32,7 +32,7 @@ function SecondarySidebar({
       title: 'Conversations',
       component: ChatPanel,
       createLabel: 'New Chat',
-      color: 'blue',
+      color: 'pink',
     },
     agents: {
       title: 'AI Agents',
@@ -44,32 +44,32 @@ function SecondarySidebar({
       title: 'Workflows',
       component: WorkflowsPanel,
       createLabel: 'Create Workflow',
-      color: 'cyan',
+      color: 'orange',
     },
     knowledge: {
       title: 'Knowledge Base',
       component: KnowledgePanel,
       createLabel: 'Add Documents',
-      color: 'amber',
+      color: 'yellow',
     },
     tools: {
       title: 'Tools & MCP',
       component: ToolsPanel,
       createLabel: 'Add Tool',
-      color: 'emerald',
+      color: 'blue',
     },
   };
 
   const config = panelConfig[activeSection];
   const PanelComponent = config?.component;
 
-  // Color mapping
+  // Color mapping - Logo-inspired gradients
   const colorClasses = {
-    blue: 'from-blue-500 to-blue-600',
+    pink: 'from-pink-500 to-pink-600',
     purple: 'from-purple-500 to-purple-600',
-    cyan: 'from-cyan-500 to-cyan-600',
-    amber: 'from-amber-500 to-amber-600',
-    emerald: 'from-emerald-500 to-emerald-600',
+    orange: 'from-orange-500 to-orange-600',
+    yellow: 'from-yellow-500 to-yellow-600',
+    blue: 'from-blue-500 to-blue-600',
   };
 
   return (

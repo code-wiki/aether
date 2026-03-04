@@ -333,7 +333,7 @@ const ComposerBar = ({ isMobile, isTablet }) => {
               "rounded-xl md:rounded-2xl p-2 md:p-3 flex gap-2 md:gap-3 items-end",
               "transition-all",
               isFocused
-                ? "border-blue-500"
+                ? "border-pink-500"
                 : "border-neutral-200 dark:border-neutral-800"
             )}
           >
@@ -401,10 +401,10 @@ const ComposerBar = ({ isMobile, isTablet }) => {
               whileHover={(!input.trim() && attachments.length === 0) || isStreaming ? {} : { scale: 1.05 }}
               whileTap={(!input.trim() && attachments.length === 0) || isStreaming ? {} : { scale: 0.95 }}
               className={cn(
-                "rounded-lg md:rounded-xl bg-blue-500 text-white",
+                "rounded-lg md:rounded-xl bg-pink-500 text-white",
                 "transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:saturate-50",
                 "min-w-[44px] min-h-[44px]", // Accessibility: touch target minimum
-                !isStreaming && (input.trim() || attachments.length > 0) && "hover:bg-blue-600 hover:shadow-glow-blue-sm",
+                !isStreaming && (input.trim() || attachments.length > 0) && "hover:bg-pink-600 hover:shadow-glow-blue-sm",
                 "p-3" // Changed from p-2 (32px) to p-3 (44px total with icon)
               )}
               aria-label="Send message"

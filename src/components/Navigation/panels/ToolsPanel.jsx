@@ -3,7 +3,7 @@ import { cn } from '../../../lib/utils';
 import { HiCubeTransparent, HiCube, HiMagnifyingGlass, HiXMark, HiStar } from 'react-icons/hi2';
 import ToolsStorage from '../../../services/storage/ToolsStorage';
 
-function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selectedTool }) {
+function ToolsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selectedTool }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all'); // 'today', 'pinned', 'all'
   const [tools, setTools] = useState([]);
@@ -67,7 +67,7 @@ function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selected
           <button
             key={tool.id}
             onClick={() => onOpenItem?.(tool)}
-            className="w-10 h-10 rounded-lg mb-2 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center hover:scale-105 transition-all shadow-lg"
+            className="w-10 h-10 rounded-lg mb-2 bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center hover:scale-105 transition-all shadow-lg"
             title={tool.name}
           >
             <span className="text-lg">{tool.icon}</span>
@@ -87,7 +87,7 @@ function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selected
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search tools..."
-          className="w-full pl-8 pr-8 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 text-sm placeholder:text-neutral-400"
+          className="w-full pl-8 pr-8 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder:text-neutral-400"
         />
         {searchQuery && (
           <button
@@ -106,7 +106,7 @@ function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selected
           className={cn(
             'px-2.5 py-1 rounded text-xs font-medium transition-colors',
             activeTab === 'all'
-              ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400'
+              ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400'
               : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
@@ -117,7 +117,7 @@ function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selected
           className={cn(
             'px-2.5 py-1 rounded text-xs font-medium transition-colors',
             activeTab === 'today'
-              ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400'
+              ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400'
               : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
@@ -128,7 +128,7 @@ function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selected
           className={cn(
             'px-2.5 py-1 rounded text-xs font-medium transition-colors',
             activeTab === 'pinned'
-              ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400'
+              ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400'
               : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
@@ -145,12 +145,12 @@ function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selected
             className={cn(
               "w-full p-2.5 rounded-md transition-colors text-left group",
               selectedTool?.id === tool.id
-                ? "bg-emerald-50 dark:bg-emerald-950/30 border-l-2 border-emerald-500"
+                ? "bg-blue-50 dark:bg-blue-950/30 border-l-2 border-blue-500"
                 : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
             )}
           >
             <div className="flex items-start gap-2">
-              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center flex-shrink-0 text-base">
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 text-base">
                 {tool.icon}
               </div>
               <div className="flex-1 min-w-0">
@@ -162,7 +162,7 @@ function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selected
                     <div
                       className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
                         tool.status === 'active'
-                          ? 'bg-emerald-500'
+                          ? 'bg-blue-500'
                           : 'bg-neutral-400'
                       }`}
                     />
@@ -195,8 +195,8 @@ function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selected
 
         {filteredTools.length === 0 && (
           <div className="text-center py-8">
-            <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
-              <HiCubeTransparent className="w-5 h-5 text-emerald-500" />
+            <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center">
+              <HiCubeTransparent className="w-5 h-5 text-blue-500" />
             </div>
             <p className="text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-0.5">
               {searchQuery ? 'No tools found' : 'No tools installed'}
@@ -209,14 +209,14 @@ function ToolsPanel({ isCollapsed, activeColor = 'emerald', onOpenItem, selected
       </div>
 
       {/* MCP Info */}
-      <div className="mt-3 p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-md">
+      <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
         <div className="flex items-start gap-1.5">
-          <HiCube className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
+          <HiCube className="w-3.5 h-3.5 text-blue-500 mt-0.5 flex-shrink-0" />
           <div>
-            <h4 className="text-xs font-medium text-emerald-700 dark:text-emerald-300 mb-0.5">
+            <h4 className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
               MCP Servers
             </h4>
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 leading-relaxed">
+            <p className="text-xs text-blue-600 dark:text-blue-400 leading-relaxed">
               Extend AI with external tools and APIs
             </p>
           </div>

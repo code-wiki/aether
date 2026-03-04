@@ -22,15 +22,15 @@ function ThinkingIndicator({ type = 'thinking', tool = null, isMobile = false })
           return {
             icon: BarChart3,
             label: 'Creating chart',
-            color: 'text-cyan-500',
-            bgColor: 'bg-cyan-50 dark:bg-cyan-950/30',
+            color: 'text-orange-500',
+            bgColor: 'bg-orange-50 dark:bg-orange-950/30',
           };
         default:
           return {
             icon: Sparkles,
             label: 'Using tool',
-            color: 'text-blue-500',
-            bgColor: 'bg-blue-50 dark:bg-blue-950/30',
+            color: 'text-pink-500',
+            bgColor: 'bg-pink-50 dark:bg-pink-950/30',
           };
       }
     }

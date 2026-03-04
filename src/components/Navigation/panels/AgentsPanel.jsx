@@ -5,7 +5,7 @@ import { HiMagnifyingGlass, HiXMark, HiSparkles, HiCog6Tooth, HiStar } from 'rea
 /**
  * AgentsPanel - Shows AI agents list
  */
-function AgentsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selectedAgent }) {
+function AgentsPanel({ isCollapsed, activeColor = 'purple', onOpenItem, selectedAgent }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all'); // 'today', 'pinned', 'all'
   const [agents, setAgents] = useState(() => {
@@ -37,7 +37,7 @@ function AgentsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selectedAg
         description: 'Writes blog posts, creates images, formats content',
         model: 'claude-sonnet-4-5',
         skills: ['writing', 'image-generation'],
-        color: 'blue',
+        color: 'purple',
         icon: '✍️',
         pinned: false,
         createdAt: Date.now() - 86400000,
@@ -124,7 +124,7 @@ function AgentsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selectedAg
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search agents..."
-          className="w-full pl-8 pr-8 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-purple-500 text-sm placeholder:text-neutral-400"
+          className="w-full pl-8 pr-8 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-purple-500 text-sm placeholder:text-neutral-400"
         />
         {searchQuery && (
           <button

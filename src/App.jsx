@@ -7,6 +7,7 @@ import { AgentProvider } from './context/AgentContext';
 import { CommandPaletteProvider } from './context/CommandPaletteContext';
 import AppShell from './components/AppShell';
 import SetupWizard from './components/Onboarding/SetupWizard';
+import WelcomeScreen from './components/Welcome/WelcomeScreen';
 import GCPAuthModal from './components/Auth/GCPAuthModal';
 import ErrorBoundary from './components/UI/ErrorBoundary';
 import { ToastContainer } from './components/UI/Toast';
@@ -18,18 +19,29 @@ function AppContent() {
   const { settings, isLoading } = useSettings();
   const [showSetupWizard, setShowSetupWizard] = useState(false);
   const [setupChecked, setSetupChecked] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [welcomeCompleted, setWelcomeCompleted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authStatus, setAuthStatus] = useState(null);
 
+  // Check if user has completed welcome on mount
+  useEffect(() => {
+    const hasCompletedWelcome = localStorage.getItem('aether:welcomeCompleted');
+    if (hasCompletedWelcome === 'true') {
+      setShowWelcome(false);
+      setWelcomeCompleted(true);
+    }
+  }, []);
+
   // Check if setup is needed on first load
   useEffect(() => {
-    if (!isLoading && !setupChecked) {
+    if (!isLoading && !setupChecked && welcomeCompleted) {
       // Show wizard if GCP is not configured
       const needsSetup = !settings.gcp?.projectId;
       setShowSetupWizard(needsSetup);
       setSetupChecked(true);
     }
-  }, [isLoading, setupChecked, settings.gcp?.projectId]);
+  }, [isLoading, setupChecked, welcomeCompleted, settings.gcp?.projectId]);
 
   // Check GCP auth status after setup is complete
   useEffect(() => {
@@ -61,6 +73,21 @@ function AppContent() {
 
     return () => clearInterval(interval);
   }, [setupChecked, settings.gcp?.projectId, showSetupWizard]);
+
+  // Show welcome screen on first launch
+  if (showWelcome && !welcomeCompleted) {
+    return (
+      <>
+        <WelcomeScreen
+          onContinue={() => {
+            setShowWelcome(false);
+            setWelcomeCompleted(true);
+          }}
+        />
+        <ToastContainer toasts={toasts} removeToast={removeToast} />
+      </>
+    );
+  }
 
   // Show loading while checking
   if (isLoading || !setupChecked) {

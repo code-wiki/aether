@@ -12,14 +12,14 @@ function PanelFilters({
   activeTab,
   onTabChange,
   searchPlaceholder = 'Search...',
-  color = 'blue', // blue, purple, cyan, amber, green
+  color = 'pink', // pink, purple, orange, yellow, blue - Logo-inspired colors
 }) {
   const colorClasses = {
-    blue: 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 ring-blue-500',
+    pink: 'bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 ring-pink-500',
     purple: 'bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 ring-purple-500',
-    cyan: 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-600 dark:text-cyan-400 ring-cyan-500',
-    amber: 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 ring-amber-500',
-    green: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 ring-emerald-500',
+    orange: 'bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 ring-orange-500',
+    yellow: 'bg-yellow-50 dark:bg-yellow-950/30 text-yellow-600 dark:text-yellow-400 ring-yellow-500',
+    blue: 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 ring-blue-500',
   };
 
   const activeClass = colorClasses[color];
