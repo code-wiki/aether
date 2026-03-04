@@ -2,18 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { SettingsProvider, useSettings } from './context/SettingsContext';
 import { ConversationProvider } from './context/ConversationContext';
+import { AttachmentProvider } from './context/AttachmentContext';
+import { AgentProvider } from './context/AgentContext';
 import { CommandPaletteProvider } from './context/CommandPaletteContext';
 import AppShell from './components/AppShell';
 import SetupWizard from './components/Onboarding/SetupWizard';
+import GCPAuthModal from './components/Auth/GCPAuthModal';
 import ErrorBoundary from './components/UI/ErrorBoundary';
 import { ToastContainer } from './components/UI/Toast';
 import { useToast } from './hooks/useToast';
+import { checkAuthStatus } from './services/gcp/authStatus';
 
 function AppContent() {
   const { toasts, removeToast } = useToast();
   const { settings, isLoading } = useSettings();
   const [showSetupWizard, setShowSetupWizard] = useState(false);
   const [setupChecked, setSetupChecked] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authStatus, setAuthStatus] = useState(null);
 
   // Check if setup is needed on first load
   useEffect(() => {
@@ -24,6 +30,37 @@ function AppContent() {
       setSetupChecked(true);
     }
   }, [isLoading, setupChecked, settings.gcp?.projectId]);
+
+  // Check GCP auth status after setup is complete
+  useEffect(() => {
+    const checkAuth = async () => {
+      // Only check if setup is complete and we have a project ID
+      if (!setupChecked || !settings.gcp?.projectId || showSetupWizard) {
+        return;
+      }
+
+      try {
+        const status = await checkAuthStatus();
+        setAuthStatus(status);
+
+        // Show modal if auth is invalid or expired
+        if (!status.valid) {
+          console.log('[App] Auth check failed:', status.message);
+          setShowAuthModal(true);
+        }
+      } catch (error) {
+        console.error('[App] Error checking auth status:', error);
+      }
+    };
+
+    // Check on mount
+    checkAuth();
+
+    // Re-check every 30 minutes
+    const interval = setInterval(checkAuth, 30 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [setupChecked, settings.gcp?.projectId, showSetupWizard]);
 
   // Show loading while checking
   if (isLoading || !setupChecked) {
@@ -52,6 +89,18 @@ function AppContent() {
     <>
       <AppShell />
       <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+      {/* GCP Auth Modal - shows when credentials expire */}
+      <GCPAuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onAuthSuccess={async () => {
+          // Re-check auth status after successful authentication
+          const status = await checkAuthStatus();
+          setAuthStatus(status);
+        }}
+        authStatus={authStatus}
+      />
     </>
   );
 }
@@ -62,9 +111,13 @@ function App() {
       <ThemeProvider>
         <SettingsProvider>
           <ConversationProvider>
-            <CommandPaletteProvider>
-              <AppContent />
-            </CommandPaletteProvider>
+            <AttachmentProvider>
+              <AgentProvider>
+                <CommandPaletteProvider>
+                  <AppContent />
+                </CommandPaletteProvider>
+              </AgentProvider>
+            </AttachmentProvider>
           </ConversationProvider>
         </SettingsProvider>
       </ThemeProvider>

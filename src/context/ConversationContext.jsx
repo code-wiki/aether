@@ -11,6 +11,7 @@ export function ConversationProvider({ children }) {
   const [messages, setMessages] = useState([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [toolExecutionStatus, setToolExecutionStatus] = useState(null); // { tool: 'image-generation', status: 'running' }
 
   // Load conversations from IndexedDB on mount
   useEffect(() => {
@@ -57,9 +58,10 @@ export function ConversationProvider({ children }) {
       title: 'New Conversation',
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      provider: 'gemini',
-      model: 'gemini-1.5-flash',
+      provider: 'claude',
+      model: 'claude-sonnet-4-5@20250929',
       messages: [],
+      pinned: false,
     };
 
     setConversations(prev => [newConversation, ...prev]);
@@ -112,13 +114,39 @@ export function ConversationProvider({ children }) {
     return newMessage;
   };
 
-  const updateLastMessage = (content) => {
+  const updateLastMessage = (content, attachments = null) => {
+    // Ensure content is always a string
+    let sanitizedContent = '';
+
+    if (typeof content === 'string') {
+      sanitizedContent = content;
+    } else if (content === null || content === undefined) {
+      sanitizedContent = '';
+    } else if (typeof content === 'object') {
+      try {
+        sanitizedContent = JSON.stringify(content, null, 2);
+      } catch (err) {
+        console.error('[ConversationContext] Failed to stringify object:', err);
+        sanitizedContent = '[Object]';
+      }
+    } else {
+      sanitizedContent = String(content);
+    }
+
+    // Extra safety: if somehow it's still not a string, force it
+    if (typeof sanitizedContent !== 'string') {
+      console.error('[ConversationContext] Content is still not a string after sanitization:', typeof sanitizedContent, sanitizedContent);
+      sanitizedContent = '';
+    }
+
     setMessages(prev => {
       const updated = [...prev];
       if (updated.length > 0) {
+        const lastMessage = updated[updated.length - 1];
         updated[updated.length - 1] = {
-          ...updated[updated.length - 1],
-          content: updated[updated.length - 1].content + content,
+          ...lastMessage,
+          content: lastMessage.content + sanitizedContent,
+          ...(attachments && { attachments: [...(lastMessage.attachments || []), ...attachments] }),
         };
       }
       return updated;
@@ -129,9 +157,11 @@ export function ConversationProvider({ children }) {
       if (conv.id === activeConversationId && conv.messages.length > 0) {
         const updatedMessages = [...conv.messages];
         const lastIndex = updatedMessages.length - 1;
+        const lastMessage = updatedMessages[lastIndex];
         updatedMessages[lastIndex] = {
-          ...updatedMessages[lastIndex],
-          content: updatedMessages[lastIndex].content + content,
+          ...lastMessage,
+          content: lastMessage.content + sanitizedContent,
+          ...(attachments && { attachments: [...(lastMessage.attachments || []), ...attachments] }),
         };
         const updated = {
           ...conv,
@@ -193,7 +223,9 @@ export function ConversationProvider({ children }) {
         messages,
         isStreaming,
         isLoading,
+        toolExecutionStatus,
         setIsStreaming,
+        setToolExecutionStatus,
         createConversation,
         loadConversation,
         addMessage,

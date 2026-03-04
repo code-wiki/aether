@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
 const os = require('os');
@@ -15,9 +15,12 @@ let mainWindow;
 const isDev = process.env.NODE_ENV !== 'production' || process.argv.includes('--dev');
 
 function createWindow() {
+  // Get the primary display's work area size (excludes taskbar/dock)
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: width,
+    height: height,
     minWidth: 900,
     minHeight: 600,
     titleBarStyle: 'hiddenInset',
@@ -30,6 +33,9 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
+
+  // Maximize window on startup
+  mainWindow.maximize();
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');

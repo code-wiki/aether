@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useConversation } from '../../context/ConversationContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useAI } from '../../hooks/useAI';
+import { ClaudeIcon, GeminiIcon, OpenAIIcon } from '../UI/ProviderIcons';
 
 function ModelSelector() {
   const { activeConversation, conversations, setConversations } = useConversation();
@@ -13,9 +14,9 @@ function ModelSelector() {
   const currentModel = activeConversation?.model || settings.defaultModel[currentProvider];
 
   const providers = [
-    { id: 'claude', name: 'Claude', icon: '🧠' },
-    { id: 'gemini', name: 'Gemini', icon: '✨' },
-    { id: 'openai', name: 'OpenAI', icon: '🤖' },
+    { id: 'claude', name: 'Claude', Icon: ClaudeIcon },
+    { id: 'gemini', name: 'Gemini', Icon: GeminiIcon },
+    { id: 'openai', name: 'OpenAI', Icon: OpenAIIcon },
   ];
 
   const handleProviderChange = (providerId) => {
@@ -62,7 +63,10 @@ function ModelSelector() {
         onClick={() => setShowDropdown(!showDropdown)}
         className="px-3 py-2 bg-surface hover:bg-surface-elevated border border-border rounded-lg text-sm font-medium text-text-primary transition-colors flex items-center gap-2"
       >
-        <span>{providers.find(p => p.id === currentProvider)?.icon}</span>
+        {(() => {
+          const ProviderIcon = providers.find(p => p.id === currentProvider)?.Icon;
+          return ProviderIcon ? <ProviderIcon className="w-5 h-5" /> : null;
+        })()}
         <span>{currentModelInfo?.name || currentModel}</span>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -80,22 +84,25 @@ function ModelSelector() {
             <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950">
               <div className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-2 uppercase tracking-wider">Provider</div>
               <div className="flex gap-2">
-                {providers.map(provider => (
-                  <button
-                    key={provider.id}
-                    onClick={() => handleProviderChange(provider.id)}
-                    className={`
-                      flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all
-                      ${currentProvider === provider.id
-                        ? 'bg-accent-500 text-white shadow-md'
-                        : 'bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-700'
-                      }
-                    `}
-                  >
-                    <div>{provider.icon}</div>
-                    <div className="text-xs mt-1">{provider.name}</div>
-                  </button>
-                ))}
+                {providers.map(provider => {
+                  const ProviderIcon = provider.Icon;
+                  return (
+                    <button
+                      key={provider.id}
+                      onClick={() => handleProviderChange(provider.id)}
+                      className={`
+                        flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all flex flex-col items-center
+                        ${currentProvider === provider.id
+                          ? 'bg-blue-500 text-white shadow-md'
+                          : 'bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-700'
+                        }
+                      `}
+                    >
+                      <ProviderIcon className="w-5 h-5" />
+                      <div className="text-xs mt-1">{provider.name}</div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -134,7 +141,7 @@ function ModelSelector() {
                     className={`
                       w-full text-left px-3 py-2 rounded-lg transition-all border
                       ${currentModel === model.id
-                        ? 'bg-accent-500 text-white border-accent-600 shadow-sm'
+                        ? 'bg-blue-500 text-white border-blue-600 shadow-sm'
                         : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-900 dark:text-neutral-100 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700'
                       }
                     `}

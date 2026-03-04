@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import { detectADC } from '../services/gcp/auth';
 import { validateClaudeModels, validateGeminiModels, clearValidationCache } from '../services/gcp/modelValidator';
-import { FALLBACK_LOCATIONS, FALLBACK_OPENAI_MODELS, KNOWN_CLAUDE_MODELS } from '../services/gcp/modelRegistry';
+import { FALLBACK_LOCATIONS, FALLBACK_OPENAI_MODELS, KNOWN_CLAUDE_MODELS, KNOWN_GEMINI_MODELS } from '../services/gcp/modelRegistry';
 
 const SettingsContext = createContext();
 
@@ -38,8 +38,8 @@ export function SettingsProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [availableLocations] = useState(FALLBACK_LOCATIONS);
   const [availableModels, setAvailableModels] = useState({
-    gemini: [],
-    claude: [],
+    gemini: KNOWN_GEMINI_MODELS, // Start with known models, validate later
+    claude: KNOWN_CLAUDE_MODELS, // Start with known models, validate later
     openai: FALLBACK_OPENAI_MODELS, // Static for OpenAI
   });
   const [discoveryLoading, setDiscoveryLoading] = useState(false);

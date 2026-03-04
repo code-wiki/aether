@@ -55,6 +55,40 @@ class BaseProvider {
   }
 
   /**
+   * Format messages with attachments for multimodal support
+   * Each provider must implement this for vision/multimodal capabilities
+   * @param {Array} messages - Standard message format with attachments
+   * @returns {Array} - Provider-specific multimodal format
+   */
+  formatMessagesWithAttachments(messages) {
+    throw new Error('formatMessagesWithAttachments() must be implemented by subclass for multimodal support');
+  }
+
+  /**
+   * Check if provider supports multimodal (vision, files, etc.)
+   * @returns {boolean}
+   */
+  supportsMultimodal() {
+    return false; // Override in subclasses that support it
+  }
+
+  /**
+   * Get supported attachment types for this provider
+   * @returns {Array<string>} Array of MIME types
+   */
+  getSupportedAttachmentTypes() {
+    return []; // Override in subclasses
+  }
+
+  /**
+   * Get maximum attachment size for this provider (in bytes)
+   * @returns {number}
+   */
+  getMaxAttachmentSize() {
+    return 10 * 1024 * 1024; // 10MB default
+  }
+
+  /**
    * Estimate tokens for a given text (rough estimate)
    * @param {string} text
    * @returns {number}

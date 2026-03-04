@@ -1,8 +1,6 @@
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
-import { MessageSquare, Trash2, Pin, Clock } from 'lucide-react';
-import { Badge } from '../../design-system/primitives';
-import { hoverLift } from '../../design-system/motion';
+import { HiChatBubbleLeftRight, HiStar, HiTrash } from 'react-icons/hi2';
+import { cn } from '../../lib/utils';
 
 /**
  * ConversationCard - Preview card for sidebar
@@ -10,7 +8,6 @@ import { hoverLift } from '../../design-system/motion';
  * - Conversation title
  * - Last message preview (truncated)
  * - Relative timestamp
- * - Model badge
  * - Message count
  * - Pin indicator
  * - Hover actions (pin, delete)
@@ -64,103 +61,64 @@ const ConversationCard = memo(({
   const messageCount = conversation.messages?.length || 0;
 
   return (
-    <motion.div
-      {...hoverLift}
+    <div
       onClick={onClick}
-      className={`
-        relative p-3 rounded-xl cursor-pointer transition-all group
-        ${isActive
-          ? 'bg-accent-500 text-white shadow-glow-accent-md'
-          : 'bg-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-900 dark:text-neutral-0 hover:shadow-sm'
-        }
-      `}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      aria-label={`Conversation: ${conversation.title}`}
-    >
-      {/* Pin indicator */}
-      {conversation.pinned && (
-        <div className="absolute top-2 right-2">
-          <Pin className={`w-3 h-3 ${isActive ? 'text-white' : 'text-accent-500'}`} fill="currentColor" />
-        </div>
+      className={cn(
+        "w-full p-2.5 rounded-md transition-colors text-left group relative cursor-pointer",
+        isActive
+          ? "bg-blue-50 dark:bg-blue-950/30 border-l-2 border-blue-500"
+          : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
       )}
+    >
+      <div className="flex items-start gap-2">
+        {/* Icon */}
+        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+          <HiChatBubbleLeftRight className="w-4 h-4 text-white" />
+        </div>
 
-      {/* Title - Reserve space for action buttons */}
-      <div className="flex items-start gap-2 mb-2 pr-20">
-        <MessageSquare className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isActive ? 'text-white' : 'text-neutral-400'}`} />
+        {/* Content */}
         <div className="flex-1 min-w-0">
-          <h3 className={`text-sm font-semibold truncate ${isActive ? 'text-white' : 'text-neutral-900 dark:text-neutral-0'}`}>
-            {conversation.title}
-          </h3>
-        </div>
-      </div>
-
-      {/* Last message preview */}
-      <p className={`text-xs line-clamp-2 mb-2 ml-6 ${isActive ? 'text-white/80' : 'text-neutral-600 dark:text-neutral-400'}`}>
-        {getLastMessagePreview()}
-      </p>
-
-      {/* Metadata */}
-      <div className="flex items-center justify-between ml-6">
-        <div className="flex items-center gap-2">
-          {/* Timestamp */}
-          <div className={`flex items-center gap-1 text-xs ${isActive ? 'text-white/70' : 'text-neutral-500 dark:text-neutral-400'}`}>
-            <Clock className="w-3 h-3" />
-            {formatTimestamp(conversation.updatedAt)}
+          <div className="flex items-center justify-between mb-0.5">
+            <h3 className="font-medium text-xs text-neutral-900 dark:text-neutral-100 truncate pr-12">
+              {conversation.title}
+            </h3>
+            <div className="flex items-center gap-0.5 flex-shrink-0 ml-1">
+              <button
+                onClick={handlePin}
+                className="p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded transition-colors"
+                title={conversation.pinned ? 'Unpin' : 'Pin'}
+              >
+                <HiStar className={cn(
+                  'w-3 h-3 transition-all',
+                  conversation.pinned
+                    ? 'text-yellow-500 fill-yellow-500'
+                    : 'text-neutral-400 opacity-0 group-hover:opacity-100'
+                )} />
+              </button>
+              <button
+                onClick={handleDelete}
+                className="p-0.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors opacity-0 group-hover:opacity-100"
+                title="Delete conversation"
+              >
+                <HiTrash className="w-3 h-3 text-red-600 dark:text-red-400" />
+              </button>
+            </div>
           </div>
-
-          {/* Message count */}
-          {messageCount > 0 && (
-            <span className={`text-xs ${isActive ? 'text-white/70' : 'text-neutral-500 dark:text-neutral-400'}`}>
-              • {messageCount} {messageCount === 1 ? 'msg' : 'msgs'}
-            </span>
-          )}
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-1 mb-1">
+            {getLastMessagePreview()}
+          </p>
+          <div className="flex items-center gap-1 text-xs text-neutral-400">
+            <span>{formatTimestamp(conversation.updatedAt)}</span>
+            {messageCount > 0 && (
+              <>
+                <span>•</span>
+                <span>{messageCount} {messageCount === 1 ? 'msg' : 'msgs'}</span>
+              </>
+            )}
+          </div>
         </div>
-
-        {/* Model badge */}
-        {conversation.model && (
-          <Badge
-            variant={isActive ? 'default' : 'primary'}
-            size="sm"
-            className={isActive ? 'bg-white/20 text-white border-white/30' : ''}
-          >
-            {conversation.model.split('-')[0]}
-          </Badge>
-        )}
       </div>
-
-      {/* Hover actions */}
-      <div
-        className={`
-          absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity
-          ${isActive ? 'opacity-100' : ''}
-        `}
-      >
-        {onPin && (
-          <button
-            onClick={handlePin}
-            className={`p-2.5 sm:p-3 min-w-[36px] min-h-[36px] sm:min-w-[44px] sm:min-h-[44px] rounded-lg hover:bg-white/20 hover:scale-110 transition-all flex items-center justify-center ${isActive ? 'text-white' : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'}`}
-            aria-label={conversation.pinned ? 'Unpin conversation' : 'Pin conversation'}
-          >
-            <Pin className="w-3.5 h-3.5" fill={conversation.pinned ? 'currentColor' : 'none'} />
-          </button>
-        )}
-
-        <button
-          onClick={handleDelete}
-          className={`p-2.5 sm:p-3 min-w-[36px] min-h-[36px] sm:min-w-[44px] sm:min-h-[44px] rounded-lg hover:bg-red-500/20 hover:scale-110 transition-all flex items-center justify-center ${isActive ? 'text-white hover:bg-red-500/30' : 'text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30'}`}
-          aria-label="Delete conversation"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    </motion.div>
+    </div>
   );
 });
 

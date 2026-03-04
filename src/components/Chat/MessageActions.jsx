@@ -1,75 +1,207 @@
 import React, { useState } from 'react';
+import { Copy, Check, RotateCcw, Edit2, GitFork, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { cn } from '../../lib/utils';
+import { motion } from 'framer-motion';
 
-function MessageActions({ message, onBranch, onEdit, onCopy }) {
-  const [showMenu, setShowMenu] = useState(false);
+/**
+ * MessageActions - Enhanced action buttons for messages
+ * Features: Copy, Edit, Regenerate, Branch, Feedback (thumbs up/down)
+ */
+function MessageActions({
+  message,
+  onCopy,
+  onEdit,
+  onRegenerate,
+  onBranch,
+  onFeedback,
+  isUser,
+  isMobile
+}) {
+  const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState(message.feedback || null);
 
-  const handleCopyText = () => {
-    navigator.clipboard.writeText(message.content);
-    setShowMenu(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      onCopy?.(message);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   };
 
-  const handleBranch = () => {
-    onBranch(message.id);
-    setShowMenu(false);
+  const handleFeedback = (type) => {
+    const newFeedback = feedback === type ? null : type;
+    setFeedback(newFeedback);
+    onFeedback?.(message.id, newFeedback);
   };
 
-  return (
-    <div className="relative inline-block">
-      <button
-        onClick={() => setShowMenu(!showMenu)}
-        className="p-2 md:p-3 min-w-[36px] min-h-[36px] md:min-w-[44px] md:min-h-[44px] rounded hover:bg-surface-elevated transition-colors opacity-0 group-hover:opacity-100 flex items-center justify-center"
-        title="Message actions"
-        aria-label="Show message actions"
-      >
-        <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-        </svg>
-      </button>
+  if (isMobile) {
+    return (
+      <div className="flex items-center gap-1 mt-2">
+        {/* Copy button */}
+        <button
+          onClick={handleCopy}
+          className={cn(
+            'p-1.5 rounded transition-colors',
+            copied
+              ? 'text-green-600 dark:text-green-400'
+              : isUser
+                ? 'text-white/70 hover:text-white hover:bg-white/10'
+                : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+          )}
+          title={copied ? 'Copied!' : 'Copy'}
+        >
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+        </button>
 
-      {showMenu && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setShowMenu(false)}
-          />
-          <div className="absolute right-0 mt-1 w-48 bg-surface-elevated border border-border rounded-lg shadow-2xl z-20 overflow-hidden">
+        {/* Edit (user only) */}
+        {isUser && (
+          <button
+            onClick={() => onEdit?.(message)}
+            className="p-1.5 rounded transition-colors text-white/70 hover:text-white hover:bg-white/10"
+            title="Edit"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Regenerate (assistant only) */}
+        {!isUser && (
+          <button
+            onClick={() => onRegenerate?.(message)}
+            className="p-1.5 rounded transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            title="Regenerate"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Feedback buttons (assistant only) */}
+        {!isUser && (
+          <div className="flex items-center gap-0.5 ml-auto">
             <button
-              onClick={handleCopyText}
-              className="w-full text-left px-4 py-2 hover:bg-surface text-text-primary transition-colors text-sm flex items-center gap-2"
+              onClick={() => handleFeedback('positive')}
+              className={cn(
+                'p-1.5 rounded transition-all',
+                feedback === 'positive'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                  : 'text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+              )}
+              title="Good response"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              Copy text
+              <ThumbsUp className="w-4 h-4" />
             </button>
-
             <button
-              onClick={handleBranch}
-              className="w-full text-left px-4 py-2 hover:bg-surface text-text-primary transition-colors text-sm flex items-center gap-2"
+              onClick={() => handleFeedback('negative')}
+              className={cn(
+                'p-1.5 rounded transition-all',
+                feedback === 'negative'
+                  ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                  : 'text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+              )}
+              title="Poor response"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-              </svg>
-              Branch from here
+              <ThumbsDown className="w-4 h-4" />
             </button>
-
-            {message.role === 'assistant' && (
-              <button
-                onClick={() => {
-                  // Regenerate response
-                  setShowMenu(false);
-                }}
-                className="w-full text-left px-4 py-2 hover:bg-surface text-text-primary transition-colors text-sm flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Regenerate
-              </button>
-            )}
           </div>
-        </>
+        )}
+      </div>
+    );
+  }
+
+  // Desktop version - always visible action bar (Claude-style)
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-1 mt-2',
+        isUser ? 'justify-end' : 'justify-start'
       )}
+    >
+      <div className="flex items-center gap-0.5 bg-transparent border-0 rounded-full px-0 py-0">
+        {/* Copy */}
+        <button
+          onClick={handleCopy}
+          className={cn(
+            'p-1.5 rounded transition-all',
+            copied
+              ? 'text-green-600 dark:text-green-400'
+              : isUser
+                ? 'text-white/70 hover:text-white hover:bg-white/10'
+                : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+          )}
+          title={copied ? 'Copied!' : 'Copy'}
+        >
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+        </button>
+
+        {/* Edit (user only) */}
+        {isUser && (
+          <button
+            onClick={() => onEdit?.(message)}
+            className="p-1.5 rounded transition-all text-white/70 hover:text-white hover:bg-white/10"
+            title="Edit message"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Regenerate (assistant only) */}
+        {!isUser && (
+          <button
+            onClick={() => onRegenerate?.(message)}
+            className="p-1.5 rounded transition-all text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            title="Regenerate response"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Branch */}
+        <button
+          onClick={() => onBranch?.(message)}
+          className={cn(
+            'p-1.5 rounded transition-all',
+            isUser
+              ? 'text-white/70 hover:text-white hover:bg-white/10'
+              : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+          )}
+          title="Branch conversation"
+        >
+          <GitFork className="w-4 h-4" />
+        </button>
+
+        {/* Feedback buttons (assistant only) */}
+        {!isUser && (
+          <>
+            <button
+              onClick={() => handleFeedback('positive')}
+              className={cn(
+                'p-1.5 rounded transition-all',
+                feedback === 'positive'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                  : 'text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300'
+              )}
+              title="Good response"
+            >
+              <ThumbsUp className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleFeedback('negative')}
+              className={cn(
+                'p-1.5 rounded transition-all',
+                feedback === 'negative'
+                  ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                  : 'text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300'
+              )}
+              title="Poor response"
+            >
+              <ThumbsDown className="w-4 h-4" />
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -94,7 +94,7 @@ function InputBox({ isStreaming }) {
           <button
             type="submit"
             disabled={(!input.trim() && attachments.length === 0) || isStreaming}
-            className="p-2 rounded-xl bg-accent hover:bg-accent-hover text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-xl bg-accent hover:bg-blue-hover text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isStreaming ? (
               <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">

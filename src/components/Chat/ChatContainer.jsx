@@ -15,8 +15,8 @@ function ChatContainer() {
       <div className="flex-1 flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="mb-6 flex justify-center">
-            <div className="p-6 bg-accent-50 dark:bg-accent-900/20 rounded-2xl">
-              <MessageSquare className="w-16 h-16 text-accent-500" />
+            <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
+              <MessageSquare className="w-16 h-16 text-blue-500" />
             </div>
           </div>
           <h2 className="text-2xl font-bold text-text-primary mb-2">Welcome to Aether</h2>

@@ -134,19 +134,22 @@ const MessageStream = ({ messages, isStreaming, isMobile, isTablet }) => {
       {/* Scroll to bottom button (when user scrolls up) - responsive */}
       {!shouldAutoScroll && (
         <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          onClick={() => {
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             setShouldAutoScroll(true);
             scrollToBottom();
           }}
           className={cn(
-            "fixed bg-neutral-900 dark:bg-neutral-100 text-neutral-0 dark:text-neutral-900",
-            "rounded-full shadow-lg hover:scale-110 transition-transform",
+            "fixed bg-blue-500/20 dark:bg-blue-500/30 backdrop-blur-sm text-blue-600 dark:text-blue-400",
+            "border border-blue-300 dark:border-blue-600",
+            "rounded-lg shadow-lg hover:bg-blue-500/30 dark:hover:bg-blue-500/40 hover:scale-105 transition-all",
             isMobile
-              ? "bottom-20 right-4 p-2.5"
-              : "bottom-32 right-6 md:right-8 p-3"
+              ? "bottom-24 right-4 p-2.5"
+              : "bottom-36 right-6 md:right-8 p-3"
           )}
           aria-label="Scroll to bottom"
         >

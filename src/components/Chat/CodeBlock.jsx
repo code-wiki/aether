@@ -16,12 +16,12 @@ function CodeBlock({ language, value }) {
   return (
     <div className="code-block-wrapper my-3 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-sm">
       <div className="flex items-center justify-between px-4 py-2 bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
-        <span className="px-2 py-0.5 text-xs font-medium text-accent-600 dark:text-accent-400 bg-accent-50 dark:bg-accent-900/30 rounded uppercase border border-accent-200 dark:border-accent-800">
+        <span className="px-2 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded uppercase border border-blue-200 dark:border-blue-800">
           {language || 'code'}
         </span>
         <button
           onClick={handleCopy}
-          className="px-3 py-1 text-xs font-medium rounded hover:bg-neutral-200 dark:hover:bg-neutral-800 hover:shadow-glow-accent-sm transition-all text-neutral-600 dark:text-neutral-400 hover:text-accent-600 dark:hover:text-accent-400 flex items-center gap-1"
+          className="px-3 py-1 text-xs font-medium rounded hover:bg-neutral-200 dark:hover:bg-neutral-800 hover:shadow-glow-blue-sm transition-all text-neutral-600 dark:text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1"
         >
           {copied ? (
             <>

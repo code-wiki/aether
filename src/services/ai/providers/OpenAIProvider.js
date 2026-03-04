@@ -40,7 +40,12 @@ class OpenAIProvider extends BaseProvider {
 
     try {
       const modelName = options.model || 'gpt-4o-mini';
-      const formattedMessages = this.formatMessages(messages);
+
+      // Check if messages contain attachments
+      const hasAttachments = messages.some(m => m.attachments && m.attachments.length > 0);
+      const formattedMessages = hasAttachments
+        ? this.formatMessagesWithAttachments(messages)
+        : this.formatMessages(messages);
 
       const response = await this.client.chat.completions.create({
         model: modelName,
@@ -63,7 +68,12 @@ class OpenAIProvider extends BaseProvider {
 
     try {
       const modelName = options.model || 'gpt-4o-mini';
-      const formattedMessages = this.formatMessages(messages);
+
+      // Check if messages contain attachments
+      const hasAttachments = messages.some(m => m.attachments && m.attachments.length > 0);
+      const formattedMessages = hasAttachments
+        ? this.formatMessagesWithAttachments(messages)
+        : this.formatMessages(messages);
 
       const stream = await this.client.chat.completions.create({
         model: modelName,
@@ -75,8 +85,12 @@ class OpenAIProvider extends BaseProvider {
 
       for await (const chunk of stream) {
         const content = chunk.choices[0]?.delta?.content || '';
-        if (content) {
+        if (content && typeof content === 'string') {
           onChunk(content);
+        } else if (content && typeof content !== 'string') {
+          // If content is not a string, convert it properly
+          console.warn('[OpenAIProvider] Non-string content received:', content);
+          onChunk(JSON.stringify(content, null, 2));
         }
       }
     } catch (error) {
@@ -106,6 +120,95 @@ class OpenAIProvider extends BaseProvider {
       role: m.role,
       content: m.content,
     }));
+  }
+
+  /**
+   * Format messages with attachments for OpenAI's vision API
+   * @param {Array} messages - Messages with attachments
+   * @returns {Array} - OpenAI chat completion format with content array
+   */
+  formatMessagesWithAttachments(messages) {
+    return messages.map(msg => {
+      // OpenAI uses content array for multimodal messages
+      const contentParts = [];
+
+      // Add text content first
+      if (msg.content) {
+        contentParts.push({
+          type: 'text',
+          text: msg.content,
+        });
+      }
+
+      // Add attachments as image_url or text content
+      if (msg.attachments && msg.attachments.length > 0) {
+        msg.attachments.forEach(att => {
+          if (att.type.startsWith('image/')) {
+            // OpenAI accepts data URLs directly
+            contentParts.push({
+              type: 'image_url',
+              image_url: {
+                url: att.data, // Full data URL with prefix
+                detail: 'auto', // Can be 'low', 'high', or 'auto'
+              },
+            });
+          } else if (att.type.startsWith('text/') || att.type === 'application/json') {
+            // For text files, decode and add as text content
+            try {
+              const base64Data = att.data.includes(',')
+                ? att.data.split(',')[1]
+                : att.data;
+              const textContent = atob(base64Data);
+              contentParts.push({
+                type: 'text',
+                text: `\n[File: ${att.name}]\n${textContent}\n[End of ${att.name}]\n`,
+              });
+            } catch (e) {
+              console.warn('[OpenAIProvider] Failed to decode text file:', att.name);
+            }
+          }
+          // Note: OpenAI doesn't support PDFs directly
+        });
+      }
+
+      return {
+        role: msg.role,
+        content: contentParts,
+      };
+    });
+  }
+
+  /**
+   * Check if OpenAI supports multimodal
+   * @returns {boolean}
+   */
+  supportsMultimodal() {
+    return true;
+  }
+
+  /**
+   * Get supported attachment types for OpenAI
+   * @returns {Array<string>}
+   */
+  getSupportedAttachmentTypes() {
+    return [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'text/plain',
+      'text/markdown',
+      'application/json',
+      'text/csv',
+    ];
+  }
+
+  /**
+   * Get maximum attachment size for OpenAI (20MB per image)
+   * @returns {number}
+   */
+  getMaxAttachmentSize() {
+    return 20 * 1024 * 1024; // 20MB
   }
 
   getAvailableModels() {

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Moon, Sun, Settings, Plus, Search, Filter, X, ChevronLeft } from 'lucide-react';
+import { Moon, Sun, Settings, Plus, Search, Filter, X, ChevronLeft, MessageSquare, Workflow } from 'lucide-react';
 import { useConversation } from '../../context/ConversationContext';
 import { useTheme } from '../../context/ThemeContext';
 import ConversationCard from './ConversationCard';
@@ -20,7 +20,8 @@ import { cn } from '../../lib/utils';
  * - Smooth animations
  * - Linear.app inspired design
  */
-const SidebarNew = ({ isOpen, isMobile, onClose, onSettingsClick }) => {
+const SidebarNew = ({ isOpen, isMobile, onClose, onSettingsClick, onWorkflowClick }) => {
+  const [activeView, setActiveView] = useState('chat'); // 'chat' | 'workflows'
   const {
     conversations,
     activeConversationId,
@@ -151,6 +152,42 @@ const SidebarNew = ({ isOpen, isMobile, onClose, onSettingsClick }) => {
                   </button>
                 )}
               </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="flex gap-2 mb-3 md:mb-4 p-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+              <button
+                onClick={() => setActiveView('chat')}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md transition-all text-sm font-medium',
+                  activeView === 'chat'
+                    ? 'bg-white dark:bg-neutral-700 text-accent-600 dark:text-accent-400 shadow-sm'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+                )}
+                aria-label="Chat view"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Chat</span>
+              </button>
+              <button
+                onClick={() => {
+                  setActiveView('workflows');
+                  if (onWorkflowClick) {
+                    onWorkflowClick();
+                    if (isMobile) onClose();
+                  }
+                }}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md transition-all text-sm font-medium',
+                  activeView === 'workflows'
+                    ? 'bg-white dark:bg-neutral-700 text-accent-600 dark:text-accent-400 shadow-sm'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+                )}
+                aria-label="Workflows view"
+              >
+                <Workflow className="w-4 h-4" />
+                <span>Agents</span>
+              </button>
             </div>
 
             <Button

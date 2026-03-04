@@ -29,13 +29,13 @@ const Button = ({
   // Linear.app inspired variants with enhanced glow
   const variantStyles = {
     // Primary: Cyan accent with gradient and subtle glow on hover
-    primary: 'bg-accent-500 text-white hover:bg-accent-600 active:bg-accent-700 shadow-sm hover:shadow-glow-accent-sm focus-visible:ring-accent-500',
+    primary: 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 shadow-sm hover:shadow-glow-blue-sm focus-visible:ring-blue-500',
 
     // Purple: Premium gradient (Linear-style) with purple glow
     purple: 'bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:from-purple-700 hover:to-purple-600 shadow-sm hover:shadow-glow-purple-sm focus-visible:ring-purple-500',
 
     // Secondary: Subtle border, transparent background with refined hover
-    secondary: 'bg-transparent border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:border-accent-500/50 focus-visible:ring-neutral-500',
+    secondary: 'bg-transparent border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:border-blue-500/50 focus-visible:ring-neutral-500',
 
     // Ghost: No background, subtle hover
     ghost: 'bg-transparent text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-900 focus-visible:ring-neutral-500',

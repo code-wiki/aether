@@ -1,16 +1,23 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import SidebarNew from './Sidebar/SidebarNew';
+import { initializeSampleData } from '../services/storage/sampleData';
+
+import PrimarySidebar from './Navigation/PrimarySidebar';
+import SecondarySidebar from './Navigation/SecondarySidebar';
+import TertiarySidebar from './Navigation/TertiarySidebar';
 import ChatView from './Chat/ChatView';
+import AgentsView from './Agents/AgentsView';
+import WorkflowsView from './WorkflowBuilder/WorkflowsView';
+import KnowledgeView from './Knowledge/KnowledgeView';
+import ToolsView from './Tools/ToolsView';
 import StatusBar from './StatusBar/StatusBar';
 import CommandPalette from './CommandPalette/CommandPalette';
 import LoadingFallback from './LazyLoad';
 import { useCommandPalette } from '../hooks/useCommandPalette';
 import { useConversation } from '../context/ConversationContext';
+import { useAgent } from '../context/AgentContext';
 import { useTheme } from '../context/ThemeContext';
 import { useResponsive } from '../hooks/useResponsive';
 import useGlobalShortcuts from '../hooks/useGlobalShortcuts';
-import { slideInLeft } from '../design-system/motion';
 
 // Lazy load Settings (only loaded when opened)
 const SettingsView = lazy(() => import('./Settings/SettingsView'));
@@ -28,21 +35,79 @@ const SettingsView = lazy(() => import('./Settings/SettingsView'));
  */
 const AppShell = () => {
   const [showSettings, setShowSettings] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('chat'); // chat | agents | workflows | knowledge | tools
+  const [secondarySidebarCollapsed, setSecondarySidebarCollapsed] = useState(false);
+  const [tertiarySidebarCollapsed, setTertiarySidebarCollapsed] = useState(false);
+
+  // Selected items for each section
+  const [selectedAgent, setSelectedAgent] = useState(null);
+  const [selectedWorkflow, setSelectedWorkflow] = useState(null);
+  const [selectedKnowledge, setSelectedKnowledge] = useState(null);
+  const [selectedTool, setSelectedTool] = useState(null);
+  const [selectedExecution, setSelectedExecution] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
+
+  // Agent sessions state
+  const [agentSessions, setAgentSessions] = useState(() => {
+    const stored = localStorage.getItem('aether_agent_sessions');
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Listen for agent session changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const stored = localStorage.getItem('aether_agent_sessions');
+      if (stored) {
+        try {
+          setAgentSessions(JSON.parse(stored));
+        } catch (e) {
+          console.error('Failed to parse agent sessions:', e);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Initialize sample data on first load
+  useEffect(() => {
+    initializeSampleData();
+  }, []);
+
+  // Trigger flags for creating new items
+  const [triggerNewWorkflow, setTriggerNewWorkflow] = useState(0);
+  const [triggerNewAgent, setTriggerNewAgent] = useState(0);
+  const [triggerNewKB, setTriggerNewKB] = useState(0);
+  const [triggerNewTool, setTriggerNewTool] = useState(0);
 
   const { togglePalette } = useCommandPalette();
   const { createConversation } = useConversation();
+  const { executions } = useAgent();
   const { toggleTheme, theme } = useTheme();
   const { isMobile, isTablet, isDesktop } = useResponsive();
 
-  // Auto-manage sidebar state based on screen size
-  useEffect(() => {
-    if (isDesktop) {
-      setSidebarOpen(true); // Always show on desktop
-    } else {
-      setSidebarOpen(false); // Hidden by default on mobile/tablet
+  // Handle "Create New" based on active section
+  const handleCreateNew = (section) => {
+    if (section === 'chat') {
+      createConversation();
+    } else if (section === 'agents') {
+      setTriggerNewAgent(prev => prev + 1);
+    } else if (section === 'workflows') {
+      setTriggerNewWorkflow(prev => prev + 1);
+    } else if (section === 'knowledge') {
+      setTriggerNewKB(prev => prev + 1);
+    } else if (section === 'tools') {
+      setTriggerNewTool(prev => prev + 1);
     }
-  }, [isDesktop]);
+  };
 
   // Global keyboard shortcuts
   const shortcuts = {
@@ -56,7 +121,7 @@ const AppShell = () => {
     },
     'mod+b': (e) => {
       e.preventDefault();
-      setSidebarOpen((prev) => !prev);
+      setSecondarySidebarCollapsed((prev) => !prev);
     },
     'mod+,': (e) => {
       e.preventDefault();
@@ -69,9 +134,6 @@ const AppShell = () => {
     'escape': () => {
       if (showSettings) {
         setShowSettings(false);
-      } else if (!isDesktop && sidebarOpen) {
-        // Close sidebar on mobile when pressing escape
-        setSidebarOpen(false);
       }
     },
   };
@@ -88,7 +150,7 @@ const AppShell = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
+    <div className="flex h-screen w-screen overflow-hidden bg-neutral-50 dark:bg-neutral-900">
       {/* Command Palette */}
       <CommandPalette
         onOpenSettings={handleOpenSettings}
@@ -97,57 +159,87 @@ const AppShell = () => {
         onExport={handleExport}
       />
 
-      {/* Sidebar - Drawer on mobile/tablet, persistent on desktop */}
-      <SidebarNew
-        isOpen={sidebarOpen}
-        isMobile={isMobile || isTablet}
-        onClose={() => setSidebarOpen(false)}
+      {/* Primary Sidebar (Always visible) */}
+      <PrimarySidebar
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
         onSettingsClick={handleOpenSettings}
       />
 
-      {/* Backdrop for mobile drawer */}
-      <AnimatePresence>
-        {(isMobile || isTablet) && sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-            aria-label="Close sidebar"
+      {/* Secondary Sidebar (Contextual) */}
+      <SecondarySidebar
+        activeSection={activeSection}
+        isCollapsed={secondarySidebarCollapsed}
+        onToggleCollapse={() => setSecondarySidebarCollapsed(!secondarySidebarCollapsed)}
+        onCreateNew={handleCreateNew}
+        onOpenAgent={setSelectedAgent}
+        onOpenWorkflow={setSelectedWorkflow}
+        onOpenKnowledge={setSelectedKnowledge}
+        onOpenMCP={setSelectedTool}
+        selectedAgent={selectedAgent}
+        selectedWorkflow={selectedWorkflow}
+        selectedKnowledge={selectedKnowledge}
+        selectedTool={selectedTool}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col relative overflow-hidden">
+        {activeSection === 'chat' && <ChatView isMobile={isMobile} isTablet={isTablet} />}
+        {activeSection === 'agents' && (
+          <AgentsView
+            isMobile={isMobile}
+            isTablet={isTablet}
+            selectedAgent={selectedAgent}
+            onAgentChange={setSelectedAgent}
+            triggerNew={triggerNewAgent}
+            selectedSession={selectedSession}
+            onSessionChange={setSelectedSession}
           />
         )}
-      </AnimatePresence>
-
-      {/* Main Content Area - Proper width constraints to prevent sidebar collapse */}
-      <div className="flex-1 flex flex-col relative overflow-hidden">
-        {/* Toggle sidebar button when closed on desktop, or hamburger on mobile */}
-        {!sidebarOpen && (
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="absolute top-3 left-3 md:top-4 md:left-4 z-10 p-2 bg-surface hover:bg-surface-hover rounded-md border border-neutral-200 dark:border-neutral-800 transition-colors shadow-sm"
-            aria-label="Open sidebar"
-          >
-            <svg
-              className="w-5 h-5 text-neutral-700 dark:text-neutral-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
+        {activeSection === 'workflows' && (
+          <WorkflowsView
+            isMobile={isMobile}
+            isTablet={isTablet}
+            selectedWorkflow={selectedWorkflow}
+            onWorkflowChange={setSelectedWorkflow}
+            triggerNew={triggerNewWorkflow}
+          />
         )}
-
-        <ChatView isMobile={isMobile} isTablet={isTablet} />
+        {activeSection === 'knowledge' && (
+          <KnowledgeView
+            isMobile={isMobile}
+            isTablet={isTablet}
+            selectedKB={selectedKnowledge}
+            onKBChange={setSelectedKnowledge}
+            triggerNew={triggerNewKB}
+          />
+        )}
+        {activeSection === 'tools' && (
+          <ToolsView
+            isMobile={isMobile}
+            isTablet={isTablet}
+            selectedTool={selectedTool}
+            onToolChange={setSelectedTool}
+            triggerNew={triggerNewTool}
+          />
+        )}
         {!isMobile && <StatusBar />}
       </div>
+
+      {/* Tertiary Sidebar - Execution History / Agent Sessions */}
+      {(activeSection === 'workflows' || activeSection === 'agents') && !isMobile && (
+        <TertiarySidebar
+          type={activeSection === 'workflows' ? 'workflow' : 'agent'}
+          selectedWorkflow={selectedWorkflow}
+          selectedAgent={selectedAgent}
+          executions={executions}
+          sessions={agentSessions}
+          onExecutionClick={setSelectedExecution}
+          onSessionClick={setSelectedSession}
+          isCollapsed={tertiarySidebarCollapsed}
+          onToggleCollapse={() => setTertiarySidebarCollapsed(!tertiarySidebarCollapsed)}
+        />
+      )}
 
       {/* Settings View (Full-screen, lazy loaded) */}
       {showSettings && (

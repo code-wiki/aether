@@ -1,0 +1,19 @@
+  const handleInstall = () => {
+    // Validate config
+    const validation = ToolsStorage.validateServerConfig(selectedServer, config);
+
+    if (!validation.valid) {
+      alert(`Configuration errors:\n${validation.errors.join('\n')}`);
+      return;
+    }
+
+    const serverData = {
+      ...selectedServer,
+      config,
+      status: 'active',
+      installedAt: initialServer?.installedAt || Date.now(),
+    };
+
+    onInstall(serverData);
+    onClose();
+  };

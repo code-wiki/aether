@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Paperclip, Loader2, Hash, Settings } from 'lucide-react';
+import { Send, Paperclip, Loader2, Hash, Settings, Wand2 } from 'lucide-react';
 import { useConversation } from '../../context/ConversationContext';
 import { useSettings } from '../../context/SettingsContext';
+import { useAttachment } from '../../context/AttachmentContext';
 import { useAI } from '../../hooks/useAI';
 import FileUpload from './FileUpload';
 import AttachmentPreview from './AttachmentPreview';
+import VoiceRecorder from './VoiceRecorder';
+import PromptEnhancer from './PromptEnhancer';
 import { fadeInUp } from '../../design-system/motion';
 import { cn } from '../../lib/utils';
 
@@ -26,10 +29,12 @@ const ComposerBar = ({ isMobile, isTablet }) => {
   const [attachments, setAttachments] = useState([]);
   const [showSlashCommands, setShowSlashCommands] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [showPromptEnhancer, setShowPromptEnhancer] = useState(false);
   const textareaRef = useRef(null);
 
-  const { activeConversation, isStreaming } = useConversation();
+  const { activeConversation, isStreaming, messages: conversationMessages } = useConversation();
   const { settings } = useSettings();
+  const { uploadAttachment } = useAttachment();
   const { sendMessage, error } = useAI();
 
   // Slash commands configuration
@@ -62,6 +67,19 @@ const ComposerBar = ({ isMobile, isTablet }) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleVoiceTranscript = (transcript) => {
+    setInput((prev) => prev + (prev ? ' ' : '') + transcript);
+  };
+
+  const handlePromptEnhance = (enhancedPrompt) => {
+    setInput(enhancedPrompt);
+    setShowPromptEnhancer(false);
+  };
+
+  const togglePromptEnhancer = () => {
+    setShowPromptEnhancer(!showPromptEnhancer);
+  };
+
   const handleSubmit = async (e) => {
     e?.preventDefault();
     if ((!input.trim() && attachments.length === 0) || isStreaming) return;
@@ -86,15 +104,30 @@ const ComposerBar = ({ isMobile, isTablet }) => {
       return;
     }
 
-    // Include file info in message (TODO: Implement actual file upload)
-    let fullMessage = message;
+    // Process file attachments through the attachment service
+    let processedAttachments = [];
     if (files.length > 0) {
-      fullMessage += '\n\n[Attachments: ' + files.map((f) => f.name).join(', ') + ']';
+      try {
+        // Files from FileUpload are already processed with base64 data
+        // We just need to ensure they have the correct structure
+        processedAttachments = files.map(file => ({
+          id: file.id || crypto.randomUUID(),
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          data: file.data, // base64 data URL
+          source: 'upload',
+          conversationId: activeConversation?.id,
+        }));
+      } catch (err) {
+        console.error('Failed to process attachments:', err);
+        // Continue without attachments if processing fails
+      }
     }
 
-    // Send to AI
+    // Send to AI with attachments
     try {
-      await sendMessage(fullMessage, provider, model);
+      await sendMessage(message, provider, model, processedAttachments);
     } catch (err) {
       console.error('Failed to send message:', err);
     }
@@ -131,6 +164,50 @@ const ComposerBar = ({ isMobile, isTablet }) => {
       setShowSlashCommands(false);
     }
   };
+
+  // Listen for message actions (edit, regenerate, quick reply)
+  useEffect(() => {
+    const handleEditMessage = (e) => {
+      const { message } = e.detail;
+      setInput(message.content);
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    };
+
+    const handleQuickReply = (e) => {
+      const { text } = e.detail;
+      setInput(text);
+      // Auto-submit quick replies
+      setTimeout(() => {
+        handleSubmit();
+      }, 100);
+    };
+
+    const handleRegenerateMessage = async (e) => {
+      const { message } = e.detail;
+      // Find the user message before this assistant message and resend it
+      // Use conversationMessages from top-level hook instead of calling hook here
+      const msgIndex = conversationMessages.findIndex(m => m.id === message.id);
+      if (msgIndex > 0 && conversationMessages[msgIndex - 1].role === 'user') {
+        const userMessage = conversationMessages[msgIndex - 1];
+        setInput(userMessage.content);
+        setTimeout(() => {
+          handleSubmit();
+        }, 100);
+      }
+    };
+
+    window.addEventListener('editMessage', handleEditMessage);
+    window.addEventListener('quickReply', handleQuickReply);
+    window.addEventListener('regenerateMessage', handleRegenerateMessage);
+
+    return () => {
+      window.removeEventListener('editMessage', handleEditMessage);
+      window.removeEventListener('quickReply', handleQuickReply);
+      window.removeEventListener('regenerateMessage', handleRegenerateMessage);
+    };
+  }, [conversationMessages]);
 
   // Estimate token count (rough approximation: 1 token ≈ 4 characters)
   const estimatedTokens = Math.ceil((input.length + attachments.length * 100) / 4);
@@ -199,6 +276,16 @@ const ComposerBar = ({ isMobile, isTablet }) => {
           )}
         </AnimatePresence>
 
+        {/* Prompt Enhancer */}
+        {showPromptEnhancer && (
+          <PromptEnhancer
+            prompt={input}
+            onApply={handlePromptEnhance}
+            onClose={() => setShowPromptEnhancer(false)}
+            isMobile={isMobile}
+          />
+        )}
+
         {/* Slash Commands Autocomplete */}
         <AnimatePresence>
           {showSlashCommands && (
@@ -246,7 +333,7 @@ const ComposerBar = ({ isMobile, isTablet }) => {
               "rounded-xl md:rounded-2xl p-2 md:p-3 flex gap-2 md:gap-3 items-end",
               "transition-all",
               isFocused
-                ? "border-accent-500"
+                ? "border-blue-500"
                 : "border-neutral-200 dark:border-neutral-800"
             )}
           >
@@ -265,11 +352,13 @@ const ComposerBar = ({ isMobile, isTablet }) => {
               rows={1}
               disabled={isStreaming}
               className={cn(
-                "flex-1 bg-transparent resize-none outline-none",
+                "flex-1 bg-transparent resize-none outline-none border-none",
                 "text-neutral-900 dark:text-neutral-0 placeholder-neutral-400",
                 "max-h-[200px] min-h-[24px]",
+                "focus:ring-0 focus:outline-none focus:border-none",
                 isMobile ? "text-sm" : "text-base"
               )}
+              style={{ border: 'none', outline: 'none' }}
             />
 
             {/* Token Counter - Desktop only */}
@@ -279,6 +368,32 @@ const ComposerBar = ({ isMobile, isTablet }) => {
               </div>
             )}
 
+            {/* Voice Recorder */}
+            <VoiceRecorder
+              onTranscript={handleVoiceTranscript}
+              disabled={isStreaming}
+              isMobile={isMobile}
+            />
+
+            {/* Prompt Enhancer Button */}
+            {input.length > 3 && !isMobile && (
+              <motion.button
+                type="button"
+                onClick={togglePromptEnhancer}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={cn(
+                  'p-2 rounded-lg transition-all',
+                  showPromptEnhancer
+                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800'
+                )}
+                title="Enhance prompt"
+              >
+                <Wand2 className="w-5 h-5" />
+              </motion.button>
+            )}
+
             {/* Send Button with enhanced states - Touch accessible (44x44px minimum) */}
             <motion.button
               type="submit"
@@ -286,10 +401,10 @@ const ComposerBar = ({ isMobile, isTablet }) => {
               whileHover={(!input.trim() && attachments.length === 0) || isStreaming ? {} : { scale: 1.05 }}
               whileTap={(!input.trim() && attachments.length === 0) || isStreaming ? {} : { scale: 0.95 }}
               className={cn(
-                "rounded-lg md:rounded-xl bg-accent-500 text-white",
+                "rounded-lg md:rounded-xl bg-blue-500 text-white",
                 "transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:saturate-50",
                 "min-w-[44px] min-h-[44px]", // Accessibility: touch target minimum
-                !isStreaming && (input.trim() || attachments.length > 0) && "hover:bg-accent-600 hover:shadow-glow-accent-sm",
+                !isStreaming && (input.trim() || attachments.length > 0) && "hover:bg-blue-600 hover:shadow-glow-blue-sm",
                 "p-3" // Changed from p-2 (32px) to p-3 (44px total with icon)
               )}
               aria-label="Send message"

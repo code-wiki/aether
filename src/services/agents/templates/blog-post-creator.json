@@ -1,0 +1,99 @@
+{
+  "id": "blog-post-creator-v1",
+  "name": "Blog Post Creator",
+  "description": "Research a topic, create an outline, write content, and generate a cover image",
+  "version": "1.0.0",
+  "tags": ["content-creation", "writing", "blogging"],
+  "inputs": [
+    {
+      "id": "topic",
+      "name": "Blog Topic",
+      "type": "text",
+      "required": true,
+      "description": "The topic you want to write about"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "input-topic",
+      "type": "input",
+      "data": {
+        "name": "topic"
+      }
+    },
+    {
+      "id": "research",
+      "type": "ai",
+      "data": {
+        "provider": "gemini",
+        "model": "gemini-1.5-flash",
+        "prompt": "Research the topic '{{topic}}' and provide 5 key points that should be covered in a blog post. Focus on interesting angles and recent developments.",
+        "temperature": 0.7
+      }
+    },
+    {
+      "id": "outline",
+      "type": "ai",
+      "data": {
+        "provider": "claude",
+        "model": "claude-sonnet-4-5@20250929",
+        "prompt": "Create a detailed blog post outline for the topic '{{topic}}' based on these key points:\n\n{{research}}\n\nThe outline should have:\n- An engaging title\n- Introduction hook\n- 3-4 main sections with subsections\n- Conclusion\n\nFormat the outline clearly with headings.",
+        "temperature": 0.8
+      }
+    },
+    {
+      "id": "write-post",
+      "type": "ai",
+      "data": {
+        "provider": "claude",
+        "model": "claude-sonnet-4-5@20250929",
+        "prompt": "Write a complete, engaging blog post following this outline:\n\n{{outline}}\n\nMake it:\n- Conversational and engaging\n- Well-researched with examples\n- Around 800-1200 words\n- Include actionable takeaways\n\nFormat in Markdown with proper headings.",
+        "temperature": 0.9,
+        "maxTokens": 4096
+      }
+    },
+    {
+      "id": "generate-cover",
+      "type": "tool",
+      "data": {
+        "tool": "image-generation",
+        "parameters": {
+          "prompt": "Create a professional, modern blog post cover image for an article about {{topic}}. Style: clean, minimalist, professional. High quality.",
+          "size": "1792x1024",
+          "quality": "hd",
+          "style": "natural"
+        }
+      }
+    },
+    {
+      "id": "output-post",
+      "type": "output",
+      "data": {
+        "source": "write-post"
+      }
+    },
+    {
+      "id": "output-cover",
+      "type": "output",
+      "data": {
+        "source": "generate-cover"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "blog-post",
+      "type": "text",
+      "source": "output-post",
+      "description": "The complete blog post in Markdown format"
+    },
+    {
+      "id": "cover-image",
+      "type": "image",
+      "source": "output-cover",
+      "description": "Generated cover image"
+    }
+  ],
+  "createdAt": 1709568000000,
+  "updatedAt": 1709568000000
+}

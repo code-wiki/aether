@@ -1,0 +1,104 @@
+{
+  "id": "data-analyzer-v1",
+  "name": "Data Analyzer",
+  "description": "Analyze data, generate insights, and create visualizations",
+  "version": "1.0.0",
+  "tags": ["data-analysis", "charts", "visualization"],
+  "inputs": [
+    {
+      "id": "data",
+      "name": "Data",
+      "type": "text",
+      "required": true,
+      "description": "Comma-separated values or JSON data to analyze"
+    },
+    {
+      "id": "question",
+      "name": "Analysis Question",
+      "type": "text",
+      "required": false,
+      "description": "What do you want to learn from this data?"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "input-data",
+      "type": "input",
+      "data": {
+        "name": "data"
+      }
+    },
+    {
+      "id": "input-question",
+      "type": "input",
+      "data": {
+        "name": "question"
+      }
+    },
+    {
+      "id": "analyze",
+      "type": "ai",
+      "data": {
+        "provider": "claude",
+        "model": "claude-sonnet-4-5@20250929",
+        "prompt": "Analyze this data:\n\n{{data}}\n\nQuestion: {{question}}\n\nProvide:\n1. Key insights and patterns\n2. Statistical summary\n3. Recommendations\n4. Suggest what chart type would best visualize this data\n\nBe specific and data-driven.",
+        "temperature": 0.3
+      }
+    },
+    {
+      "id": "extract-chart-data",
+      "type": "ai",
+      "data": {
+        "provider": "gemini",
+        "model": "gemini-1.5-flash",
+        "prompt": "From this data:\n\n{{data}}\n\nExtract chart data in this JSON format:\n{\n  \"type\": \"bar\" or \"line\" or \"pie\",\n  \"labels\": [\"Label1\", \"Label2\", ...],\n  \"values\": [value1, value2, ...],\n  \"title\": \"Chart Title\"\n}\n\nReturn ONLY the JSON, no other text.",
+        "temperature": 0.1
+      }
+    },
+    {
+      "id": "create-chart",
+      "type": "tool",
+      "data": {
+        "tool": "chart-generation",
+        "parameters": {
+          "type": "bar",
+          "labels": ["Q1", "Q2", "Q3", "Q4"],
+          "values": [10, 20, 15, 30],
+          "title": "Data Visualization",
+          "width": 800,
+          "height": 500
+        }
+      }
+    },
+    {
+      "id": "output-analysis",
+      "type": "output",
+      "data": {
+        "source": "analyze"
+      }
+    },
+    {
+      "id": "output-chart",
+      "type": "output",
+      "data": {
+        "source": "create-chart"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "analysis",
+      "type": "text",
+      "source": "output-analysis",
+      "description": "Analysis results and insights"
+    },
+    {
+      "id": "chart",
+      "type": "image",
+      "source": "output-chart",
+      "description": "Generated chart visualization"
+    }
+  ],
+  "createdAt": 1709568000000,
+  "updatedAt": 1709568000000
+}
