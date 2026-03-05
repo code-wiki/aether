@@ -42,48 +42,57 @@ function PromptEnhancer({ prompt, onApply, onClose, isMobile }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
         className={cn(
-          'mb-2 p-3 rounded-xl border bg-gradient-to-r from-purple-50 to-purple-50 dark:from-purple-950/20 dark:to-purple-950/20 border-purple-200 dark:border-purple-800',
-          isMobile ? 'text-xs' : 'text-sm'
+          'mb-2 rounded-xl border bg-gradient-to-r from-purple-50 to-purple-50 dark:from-purple-950/20 dark:to-purple-950/20 border-purple-200 dark:border-purple-800',
+          isMobile ? 'p-2 text-xs' : 'p-3 text-sm'
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-            <span className="font-semibold text-purple-900 dark:text-purple-100">
+        <div className={cn('flex items-center justify-between', isMobile ? 'mb-2' : 'mb-3')}>
+          <div className="flex items-center gap-1.5 md:gap-2 flex-1 min-w-0">
+            <Sparkles className={cn('flex-shrink-0 text-purple-600 dark:text-purple-400', isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
+            <span className={cn('font-semibold text-purple-900 dark:text-purple-100 truncate', isMobile ? 'text-xs' : 'text-sm')}>
               Prompt Enhancement
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded hover:bg-purple-200/50 dark:hover:bg-purple-900/30 transition-colors"
+            className="p-1 rounded hover:bg-purple-200/50 dark:hover:bg-purple-900/30 transition-colors flex-shrink-0"
           >
-            <X className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <X className={cn('text-purple-600 dark:text-purple-400', isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
           </button>
         </div>
 
         {/* Optimized Prompt Preview */}
         {hasOptimizations && (
-          <div className="mb-3">
-            <div className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-2">
+          <div className={cn(isMobile ? 'mb-2' : 'mb-3')}>
+            <div className={cn('font-medium text-purple-700 dark:text-purple-300', isMobile ? 'text-xs mb-1.5' : 'text-xs mb-2')}>
               Enhanced Version:
             </div>
-            <div className="p-3 bg-white dark:bg-neutral-900 rounded-lg border border-purple-200 dark:border-purple-800 mb-2">
-              <p className="text-sm text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap">
+            <div className={cn(
+              'bg-white dark:bg-neutral-900 rounded-lg border border-purple-200 dark:border-purple-800 overflow-auto',
+              isMobile ? 'p-2 mb-1.5 max-h-32' : 'p-3 mb-2 max-h-48'
+            )}>
+              <p className={cn('text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap break-words', isMobile ? 'text-xs' : 'text-sm')}>
                 {optimizedPrompt}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className={cn('flex gap-1.5 md:gap-2', isMobile ? 'flex-col' : 'flex-row')}>
               <button
                 onClick={() => onApply(optimizedPrompt)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-medium transition-colors"
+                className={cn(
+                  'flex items-center justify-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors',
+                  isMobile ? 'px-2.5 py-2 text-xs w-full' : 'px-3 py-1.5 text-xs'
+                )}
               >
-                <Check className="w-3.5 h-3.5" />
-                Use Enhanced Version
+                <Check className={cn(isMobile ? 'w-3 h-3' : 'w-3.5 h-3.5')} />
+                <span className="truncate">Use Enhanced Version</span>
               </button>
               <button
                 onClick={onClose}
-                className="px-3 py-1.5 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg text-xs font-medium transition-colors border border-neutral-200 dark:border-neutral-700"
+                className={cn(
+                  'bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg font-medium transition-colors border border-neutral-200 dark:border-neutral-700',
+                  isMobile ? 'px-2.5 py-2 text-xs w-full' : 'px-3 py-1.5 text-xs'
+                )}
               >
                 Keep Original
               </button>
@@ -94,28 +103,31 @@ function PromptEnhancer({ prompt, onApply, onClose, isMobile }) {
         {/* Suggestions */}
         {suggestions.length > 0 && (
           <div>
-            <div className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-2">
+            <div className={cn('font-medium text-purple-700 dark:text-purple-300', isMobile ? 'text-xs mb-1.5' : 'text-xs mb-2')}>
               Suggestions:
             </div>
-            <div className="space-y-2">
+            <div className={cn('space-y-1.5 md:space-y-2', isMobile && 'max-h-60 overflow-y-auto')}>
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index}
-                  className="p-2.5 bg-white dark:bg-neutral-900 rounded-lg border border-purple-200 dark:border-purple-800"
+                  className={cn(
+                    'bg-white dark:bg-neutral-900 rounded-lg border border-purple-200 dark:border-purple-800',
+                    isMobile ? 'p-2' : 'p-2.5'
+                  )}
                 >
-                  <div className="flex items-start gap-2">
-                    <Wand2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+                  <div className={cn('flex items-start', isMobile ? 'gap-1.5' : 'gap-2')}>
+                    <Wand2 className={cn('text-purple-600 dark:text-purple-400 flex-shrink-0', isMobile ? 'w-3 h-3 mt-0.5' : 'w-3.5 h-3.5 mt-0.5')} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-purple-900 dark:text-purple-100 text-xs">
+                      <div className={cn('font-medium text-purple-900 dark:text-purple-100 break-words', isMobile ? 'text-xs' : 'text-xs')}>
                         {suggestion.label}
                       </div>
-                      <div className="text-xs text-purple-700 dark:text-purple-300 mt-0.5">
+                      <div className={cn('text-purple-700 dark:text-purple-300 break-words', isMobile ? 'text-xs mt-0.5' : 'text-xs mt-0.5')}>
                         {suggestion.description}
                       </div>
                       {suggestion.preview && (
                         <button
                           onClick={() => setSelectedSuggestion(selectedSuggestion === index ? null : index)}
-                          className="text-xs text-purple-600 dark:text-purple-400 hover:underline mt-1"
+                          className={cn('text-purple-600 dark:text-purple-400 hover:underline', isMobile ? 'text-xs mt-1' : 'text-xs mt-1')}
                         >
                           {selectedSuggestion === index ? 'Hide preview' : 'Show preview'}
                         </button>
@@ -125,14 +137,20 @@ function PromptEnhancer({ prompt, onApply, onClose, isMobile }) {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="mt-2 p-2 bg-purple-50 dark:bg-purple-950/30 rounded border border-purple-200 dark:border-purple-800"
+                          className={cn(
+                            'bg-purple-50 dark:bg-purple-950/30 rounded border border-purple-200 dark:border-purple-800 overflow-auto',
+                            isMobile ? 'mt-1.5 p-1.5 max-h-24' : 'mt-2 p-2 max-h-32'
+                          )}
                         >
-                          <p className="text-xs text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap">
+                          <p className={cn('text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap break-words', isMobile ? 'text-xs' : 'text-xs')}>
                             {suggestion.preview}
                           </p>
                           <button
                             onClick={() => onApply(suggestion.preview)}
-                            className="mt-2 px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs font-medium transition-colors"
+                            className={cn(
+                              'bg-purple-600 hover:bg-purple-700 text-white rounded font-medium transition-colors w-full md:w-auto',
+                              isMobile ? 'mt-1.5 px-2 py-1.5 text-xs' : 'mt-2 px-2 py-1 text-xs'
+                            )}
                           >
                             Use This
                           </button>

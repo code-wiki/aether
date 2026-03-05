@@ -2,19 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from '../../context/SettingsContext';
 import { checkAuthStatus, testAuthConnection, getAuthInstructions } from '../../services/gcp/authStatus';
+import { startGUIAuthentication, waitForCredentials } from '../../services/gcp/oauth';
+import { detectADC } from '../../services/gcp/auth';
 import Button from '../../design-system/primitives/Button';
 import Card from '../../design-system/primitives/Card';
 import Badge from '../../design-system/primitives/Badge';
 import AetherLogo from '../UI/AetherLogo';
-import { CheckCircle2, Terminal, Copy, Check, AlertCircle, Sparkles, Zap, Shield, Rocket } from 'lucide-react';
+import { CheckCircle2, Terminal, Copy, Check, AlertCircle, Sparkles, Zap, Shield, Rocket, LogIn } from 'lucide-react';
 import { fadeInUp, staggerContainer, staggerItem } from '../../design-system/motion';
+import { cn } from '../../lib/utils';
 
 /**
  * WelcomeScreen - Premium first-launch screen with GCP auth handling
  * States: checking, authenticated, needs-auth
  */
 function WelcomeScreen({ onContinue }) {
-  const { settings } = useSettings();
+  const { settings, updateGCPConfig } = useSettings();
   const [authState, setAuthState] = useState('checking');
   const [authStatus, setAuthStatus] = useState(null);
   const [testing, setTesting] = useState(false);
@@ -31,6 +34,17 @@ function WelcomeScreen({ onContinue }) {
       setAuthStatus(status);
 
       if (status.valid) {
+        // Auth is valid - detect and save project ID to settings
+        const adcResult = await detectADC();
+
+        if (adcResult.success && adcResult.projectId) {
+          // Save project ID to settings so SetupWizard doesn't appear
+          await updateGCPConfig({
+            projectId: adcResult.projectId,
+          });
+          console.log('[WelcomeScreen] Saved project ID to settings:', adcResult.projectId);
+        }
+
         setAuthState('authenticated');
       } else {
         setAuthState('needs-auth');
@@ -50,7 +64,7 @@ function WelcomeScreen({ onContinue }) {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-yellow-50 via-pink-50 to-purple-50
       dark:from-neutral-950 dark:via-purple-950/30 dark:to-purple-950/30
-      flex items-center justify-center p-6 overflow-hidden">
+      flex items-center justify-center p-4 sm:p-6 overflow-y-auto overflow-x-hidden">
 
       {/* Decorative Background Elements */}
       <DecorativeElements />
@@ -73,6 +87,7 @@ function WelcomeScreen({ onContinue }) {
             authStatus={authStatus}
             testing={testing}
             setTesting={setTesting}
+            updateGCPConfig={updateGCPConfig}
           />
         )}
       </AnimatePresence>
@@ -84,11 +99,12 @@ function WelcomeScreen({ onContinue }) {
 function DecorativeElements() {
   return (
     <>
-      {/* Animated gradient orbs - matching logo colors */}
+      {/* Animated gradient orbs - matching logo colors - Responsive */}
 
       {/* Yellow to Orange orb - top left */}
       <motion.div
-        className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-yellow-400/25 to-orange-400/25
+        className="absolute top-[10%] left-[5%] w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96
+          bg-gradient-to-br from-yellow-400/25 to-orange-400/25
           dark:from-yellow-600/15 dark:to-orange-600/15 rounded-full blur-3xl"
         animate={{
           scale: [1, 1.2, 1],
@@ -103,7 +119,8 @@ function DecorativeElements() {
 
       {/* Pink to Purple orb - top right */}
       <motion.div
-        className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-br from-pink-400/25 to-purple-400/25
+        className="absolute top-[15%] right-[5%] w-40 h-40 sm:w-56 sm:h-56 lg:w-80 lg:h-80
+          bg-gradient-to-br from-pink-400/25 to-purple-400/25
           dark:from-pink-600/15 dark:to-purple-600/15 rounded-full blur-3xl"
         animate={{
           scale: [1.1, 1.3, 1.1],
@@ -119,7 +136,8 @@ function DecorativeElements() {
 
       {/* Blue to Purple orb - bottom right */}
       <motion.div
-        className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-pink-400/25 to-purple-500/25
+        className="absolute bottom-[10%] right-[5%] w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96
+          bg-gradient-to-br from-pink-400/25 to-purple-500/25
           dark:from-pink-600/15 dark:to-purple-600/15 rounded-full blur-3xl"
         animate={{
           scale: [1.2, 1, 1.2],
@@ -135,7 +153,8 @@ function DecorativeElements() {
 
       {/* Red to Pink orb - bottom left */}
       <motion.div
-        className="absolute bottom-32 left-32 w-72 h-72 bg-gradient-to-br from-red-400/20 to-pink-400/20
+        className="absolute bottom-[15%] left-[8%] w-36 h-36 sm:w-48 sm:h-48 lg:w-72 lg:h-72
+          bg-gradient-to-br from-red-400/20 to-pink-400/20
           dark:from-red-600/12 dark:to-pink-600/12 rounded-full blur-3xl"
         animate={{
           scale: [1, 1.15, 1],
@@ -151,7 +170,8 @@ function DecorativeElements() {
 
       {/* Orange to Red orb - center */}
       <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px]
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+          w-64 h-64 sm:w-80 sm:h-80 lg:w-[500px] lg:h-[500px]
           bg-gradient-to-br from-orange-300/15 to-red-300/15
           dark:from-orange-600/10 dark:to-red-600/10 rounded-full blur-3xl"
         animate={{
@@ -166,9 +186,10 @@ function DecorativeElements() {
         }}
       />
 
-      {/* Abstract shapes - colorful accents */}
+      {/* Abstract shapes - colorful accents - Hidden on mobile for cleaner look */}
       <motion.div
-        className="absolute top-40 right-40 w-32 h-32 border-2 border-purple-300 dark:border-purple-700 rounded-2xl rotate-12"
+        className="hidden md:block absolute top-[20%] right-[15%] w-20 h-20 lg:w-32 lg:h-32
+          border-2 border-purple-300 dark:border-purple-700 rounded-2xl rotate-12"
         animate={{
           rotate: [12, 22, 12],
           y: [0, -10, 0],
@@ -180,7 +201,8 @@ function DecorativeElements() {
         }}
       />
       <motion.div
-        className="absolute top-60 left-1/3 w-20 h-20 border-2 border-pink-300 dark:border-pink-700 rounded-full"
+        className="hidden lg:block absolute top-[35%] left-[20%] w-16 h-16 lg:w-20 lg:h-20
+          border-2 border-pink-300 dark:border-pink-700 rounded-full"
         animate={{
           scale: [1, 1.1, 1],
           opacity: [0.5, 0.8, 0.5],
@@ -193,7 +215,8 @@ function DecorativeElements() {
         }}
       />
       <motion.div
-        className="absolute bottom-40 left-40 w-28 h-28 bg-gradient-to-br from-yellow-300/40 to-orange-300/40
+        className="hidden md:block absolute bottom-[20%] left-[15%] w-20 h-20 lg:w-28 lg:h-28
+          bg-gradient-to-br from-yellow-300/40 to-orange-300/40
           dark:from-yellow-600/25 dark:to-orange-600/25 rounded-3xl"
         animate={{
           rotate: [0, 360],
@@ -205,7 +228,8 @@ function DecorativeElements() {
         }}
       />
       <motion.div
-        className="absolute bottom-1/3 right-1/4 w-16 h-16 bg-gradient-to-br from-pink-300/50 to-cyan-300/50
+        className="hidden lg:block absolute bottom-[30%] right-[20%] w-12 h-12 lg:w-16 lg:h-16
+          bg-gradient-to-br from-pink-300/50 to-cyan-300/50
           dark:from-pink-600/30 dark:to-cyan-600/30 rounded-lg rotate-45"
         animate={{
           rotate: [45, 90, 45],
@@ -219,8 +243,9 @@ function DecorativeElements() {
         }}
       />
 
-      {/* Squiggly lines - colorful */}
-      <svg className="absolute top-32 left-1/4 w-32 h-32 text-pink-300 dark:text-pink-700" viewBox="0 0 100 100">
+      {/* Squiggly lines - colorful - Hidden on mobile */}
+      <svg className="hidden lg:block absolute top-[25%] left-[18%] w-20 h-20 lg:w-32 lg:h-32
+        text-pink-300 dark:text-pink-700" viewBox="0 0 100 100">
         <motion.path
           d="M10,50 Q30,30 50,50 T90,50"
           fill="none"
@@ -231,7 +256,8 @@ function DecorativeElements() {
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
       </svg>
-      <svg className="absolute bottom-32 right-1/4 w-32 h-32 text-purple-300 dark:text-purple-700" viewBox="0 0 100 100">
+      <svg className="hidden lg:block absolute bottom-[25%] right-[18%] w-20 h-20 lg:w-32 lg:h-32
+        text-purple-300 dark:text-purple-700" viewBox="0 0 100 100">
         <motion.path
           d="M10,30 Q30,50 50,30 T90,30"
           fill="none"
@@ -242,7 +268,8 @@ function DecorativeElements() {
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
         />
       </svg>
-      <svg className="absolute top-1/2 right-1/3 w-24 h-24 text-orange-300 dark:text-orange-700" viewBox="0 0 100 100">
+      <svg className="hidden md:block absolute top-1/2 right-[25%] w-16 h-16 lg:w-24 lg:h-24
+        text-orange-300 dark:text-orange-700" viewBox="0 0 100 100">
         <motion.path
           d="M20,50 Q40,20 60,50 T100,50"
           fill="none"
@@ -338,12 +365,12 @@ function WelcomeState({ onContinue, projectId, location }) {
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="relative z-10 w-full max-w-2xl mx-auto px-4"
+      className="relative z-10 w-full max-w-2xl mx-auto px-3 sm:px-4"
     >
       {/* Centered Card */}
       <motion.div
         variants={staggerItem}
-        className="p-10 md:p-14 rounded-3xl bg-white/60 dark:bg-neutral-900/60
+        className="p-6 sm:p-8 md:p-10 lg:p-14 rounded-2xl sm:rounded-3xl bg-white/60 dark:bg-neutral-900/60
           backdrop-blur-xl border border-white/40 dark:border-neutral-700/40 shadow-sm"
       >
         {/* Logo */}
@@ -351,14 +378,14 @@ function WelcomeState({ onContinue, projectId, location }) {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 20 }}
-          className="text-center mb-8"
+          className="text-center mb-6 sm:mb-8"
         >
           <AetherLogo size={80} className="mx-auto drop-shadow-2xl" />
         </motion.div>
 
         {/* Title */}
         <motion.h1
-          className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 leading-tight mb-4 text-center tracking-tight"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 leading-tight mb-3 sm:mb-4 text-center tracking-tight"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -368,7 +395,7 @@ function WelcomeState({ onContinue, projectId, location }) {
 
         {/* Subtitle */}
         <motion.p
-          className="text-base md:text-lg text-neutral-600 dark:text-neutral-400 text-center mb-12 max-w-lg mx-auto leading-relaxed"
+          className="text-sm sm:text-base md:text-lg text-neutral-600 dark:text-neutral-400 text-center mb-8 sm:mb-12 max-w-lg mx-auto leading-relaxed"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -500,9 +527,11 @@ function WelcomeState({ onContinue, projectId, location }) {
 }
 
 // Auth Required State - Setup needed
-function AuthRequiredState({ onRetry, onSkip, authStatus, testing, setTesting }) {
+function AuthRequiredState({ onRetry, onSkip, authStatus, testing, setTesting, updateGCPConfig }) {
   const [copied, setCopied] = useState(false);
   const [testResult, setTestResult] = useState(null);
+  const [authenticating, setAuthenticating] = useState(false);
+  const [authProgress, setAuthProgress] = useState(null);
   const instructions = getAuthInstructions();
 
   const handleCopy = async (text) => {
@@ -522,6 +551,86 @@ function AuthRequiredState({ onRetry, onSkip, authStatus, testing, setTesting })
       window.electron.shell.exec('start cmd.exe /K "gcloud auth application-default login"');
     } else {
       window.electron.shell.exec('x-terminal-emulator -e "gcloud auth application-default login" || gnome-terminal -- bash -c "gcloud auth application-default login; exec bash"');
+    }
+  };
+
+  const handleGUIAuthentication = async () => {
+    setAuthenticating(true);
+    setAuthProgress('Opening browser for authentication...');
+    setTestResult(null);
+
+    try {
+      // Start the OAuth flow
+      const authResult = await startGUIAuthentication();
+
+      if (!authResult.success) {
+        setTestResult({
+          success: false,
+          message: authResult.error || 'Failed to start authentication. Please try terminal method.'
+        });
+        setAuthenticating(false);
+        setAuthProgress(null);
+        return;
+      }
+
+      setAuthProgress('Complete sign-in in your browser...');
+
+      // Wait for credentials to be saved
+      const waitResult = await waitForCredentials(120000); // 2 minute timeout
+
+      if (waitResult.success) {
+        setAuthProgress('Verifying credentials...');
+
+        // Test the connection
+        const testResult = await testAuthConnection();
+
+        if (testResult.success) {
+          setTestResult({
+            success: true,
+            message: 'Successfully authenticated with Google Cloud!'
+          });
+
+          // Detect and save project ID
+          setAuthProgress('Saving configuration...');
+          const adcResult = await detectADC();
+
+          if (adcResult.success && adcResult.projectId) {
+            await updateGCPConfig({
+              projectId: adcResult.projectId,
+            });
+            console.log('[WelcomeScreen] Saved project ID to settings:', adcResult.projectId);
+          }
+
+          // Continue to app
+          setTimeout(() => {
+            onRetry();
+          }, 1000);
+        } else {
+          setTestResult({
+            success: false,
+            message: 'Verification failed. Please try again.'
+          });
+        }
+      } else if (waitResult.timeout) {
+        setTestResult({
+          success: false,
+          message: 'Authentication timeout. Complete sign-in and click "I\'ve Authenticated".'
+        });
+      } else {
+        setTestResult({
+          success: false,
+          message: 'Failed to detect credentials. Try again or use terminal method.'
+        });
+      }
+
+    } catch (error) {
+      setTestResult({
+        success: false,
+        message: error.message || 'Authentication failed'
+      });
+    } finally {
+      setAuthenticating(false);
+      setAuthProgress(null);
     }
   };
 
@@ -553,141 +662,161 @@ function AuthRequiredState({ onRetry, onSkip, authStatus, testing, setTesting })
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="relative z-10 w-full max-w-2xl mx-auto px-4"
+      className="relative z-10 w-full max-w-xl mx-auto px-2 sm:px-3"
     >
 
       {/* Centered Setup Card */}
       <motion.div variants={staggerItem}>
-        <div className="relative overflow-hidden rounded-3xl bg-white/60 dark:bg-neutral-900/60
-          backdrop-blur-xl border border-white/40 dark:border-neutral-700/40 shadow-sm p-8 md:p-12">
+        <div className="relative overflow-hidden rounded-lg sm:rounded-xl bg-white/60 dark:bg-neutral-900/60
+          backdrop-blur-xl border border-white/40 dark:border-neutral-700/40 shadow-sm p-4 sm:p-5">
 
           {/* Logo & Title */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="text-center mb-8"
+            className="text-center mb-3 sm:mb-4"
           >
-            <AetherLogo size={100} className="mx-auto mb-6 drop-shadow-2xl" />
+            <AetherLogo size={60} className="mx-auto mb-2 sm:mb-3 drop-shadow-2xl" />
           </motion.div>
 
           <motion.h1
-            className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600
-              dark:from-orange-400 dark:via-pink-400 dark:to-purple-500 bg-clip-text text-transparent leading-tight text-center mb-4"
+            className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600
+              dark:from-orange-400 dark:via-pink-400 dark:to-purple-500 bg-clip-text text-transparent leading-tight text-center mb-1 sm:mb-2"
           >
             Let's Get Started
           </motion.h1>
 
-          <motion.p className="text-base md:text-lg text-neutral-600 dark:text-neutral-400 text-center mb-8">
-            Authenticate with Google Cloud to unlock premium AI models powered by Vertex AI
+          <motion.p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 text-center mb-4 sm:mb-5">
+            Authenticate with Google Cloud
           </motion.p>
 
-          {/* Setup Steps */}
-          <div className="space-y-6 mb-8">
-            {instructions.steps.map((step, index) => (
-              <motion.div
-                key={step.number}
-                className="flex gap-5"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                {/* Step Number - Enhanced */}
-                <div className="flex-shrink-0">
-                  <motion.div
-                    className={`w-10 h-10 flex items-center justify-center bg-gradient-to-br text-white rounded-xl font-bold text-lg shadow-lg ${
-                      index === 0 ? 'from-orange-500 to-orange-600 shadow-orange-500/30' :
-                      index === 1 ? 'from-pink-500 to-pink-600 shadow-pink-500/30' :
-                      index === 2 ? 'from-purple-500 to-purple-600 shadow-purple-500/30' :
-                      'from-pink-500 to-purple-600 shadow-blue-500/30'
-                    }`}
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    {step.number}
-                  </motion.div>
-                </div>
-
-                {/* Step Content */}
-                <div className="flex-1 pt-1">
-                  <p className="text-base font-medium text-neutral-800 dark:text-neutral-200 mb-3">
-                    {step.description}
-                  </p>
-
-                  {step.command && (
-                    <div className="flex items-stretch gap-2">
-                      <code className="flex-1 px-4 py-3.5 bg-neutral-100/80 dark:bg-neutral-800/80
-                        backdrop-blur-sm rounded-xl font-mono text-sm text-neutral-900 dark:text-neutral-100
-                        border border-neutral-200 dark:border-neutral-700 overflow-x-auto">
-                        {step.command}
-                      </code>
-
-                      <motion.button
-                        onClick={() => handleCopy(step.command)}
-                        className="px-4 py-3.5 rounded-xl bg-neutral-100 dark:bg-neutral-800
-                          hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-all flex-shrink-0
-                          border border-neutral-200 dark:border-neutral-700 hover:border-pink-300 dark:hover:border-pink-700"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        title={copied ? 'Copied!' : 'Copy command'}
-                      >
-                        {copied ? (
-                          <Check className="w-5 h-5 text-pink-600 dark:text-pink-400" />
-                        ) : (
-                          <Copy className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
-                        )}
-                      </motion.button>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Quick Action */}
+          {/* Quick Setup - GUI Authentication (RECOMMENDED) */}
           <motion.div
-            className="p-6 rounded-2xl bg-gradient-to-br from-orange-50/80 to-pink-50/80 dark:from-orange-950/30 dark:to-pink-950/30
-              border border-orange-200/50 dark:border-orange-700/30 mb-8"
+            className="p-3 sm:p-4 rounded-lg bg-gradient-to-br from-pink-50/80 to-orange-50/80 dark:from-pink-950/30 dark:to-orange-950/30
+              border border-pink-200/50 dark:border-pink-700/30 mb-2 sm:mb-3"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
           >
-            <div className="flex items-start gap-4">
+            <div className="flex items-center gap-2 mb-2">
               <motion.div
-                className="p-3 bg-gradient-to-br from-orange-500 to-pink-500 rounded-xl shadow-sm flex-shrink-0"
+                className="p-2 bg-gradient-to-br from-pink-500 to-orange-500 rounded-lg shadow-sm flex-shrink-0"
                 animate={{
                   boxShadow: [
-                    '0 2px 10px rgba(249, 115, 22, 0.2)',
-                    '0 2px 15px rgba(236, 72, 153, 0.3)',
-                    '0 2px 10px rgba(249, 115, 22, 0.2)',
+                    '0 2px 10px rgba(236, 72, 153, 0.2)',
+                    '0 2px 15px rgba(249, 115, 22, 0.3)',
+                    '0 2px 10px rgba(236, 72, 153, 0.2)',
                   ]
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <Terminal className="w-6 h-6 text-white" />
+                <LogIn className="w-4 h-4 text-white" />
               </motion.div>
 
-              <div className="flex-1">
-                <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 mb-2">
-                  ⚡ Quick Setup
-                </h3>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
-                  Launch your terminal with the authentication command pre-loaded.
-                </p>
+              <h3 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-neutral-100">
+                Quick Setup
+              </h3>
+            </div>
 
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={openTerminal}
-                    className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 hover:from-orange-600 hover:via-pink-600 hover:to-purple-700
-                      shadow-sm border-none rounded-xl px-6 w-full"
-                  >
-                    <Terminal className="w-4 h-4 mr-2" />
-                    Open Terminal & Authenticate
-                  </Button>
-                </motion.div>
+            <motion.button
+              onClick={handleGUIAuthentication}
+              disabled={authenticating}
+              className={cn(
+                'w-full py-2.5 sm:py-3 px-5 sm:px-6 bg-gradient-to-r from-pink-600 to-orange-600 hover:from-pink-700 hover:to-orange-700 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-lg',
+                authenticating && 'opacity-50 cursor-not-allowed'
+              )}
+              whileHover={!authenticating ? { scale: 1.02 } : {}}
+              whileTap={!authenticating ? { scale: 0.98 } : {}}
+            >
+              {authenticating ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                <>
+                  <LogIn className="w-5 h-5" />
+                  Sign in with Google
+                </>
+              )}
+            </motion.button>
+
+            {authProgress && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-3 bg-white/60 dark:bg-neutral-900/60 backdrop-blur-sm rounded-xl border border-pink-200/50 dark:border-pink-700/30"
+              >
+                <p className="text-sm text-pink-600 dark:text-pink-400 flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-pink-600 border-t-transparent rounded-full animate-spin" />
+                  {authProgress}
+                </p>
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* Divider */}
+          <div className="relative mb-4 sm:mb-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-neutral-300 dark:border-neutral-700" />
+            </div>
+            <div className="relative flex justify-center text-xs sm:text-sm">
+              <span className="px-3 sm:px-4 bg-white/60 dark:bg-neutral-900/60 backdrop-blur-sm text-neutral-500 dark:text-neutral-400 rounded-full">
+                Or use terminal
+              </span>
+            </div>
+          </div>
+
+          {/* Manual Setup - Terminal */}
+          <motion.div
+            className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/50 border border-neutral-200/50 dark:border-neutral-700/30 mb-5 sm:mb-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex items-start gap-2 sm:gap-3 mb-3">
+              <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-600 dark:text-neutral-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-sm sm:text-base font-semibold text-neutral-900 dark:text-neutral-100 mb-0.5">
+                  Manual Setup
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
+                  Run this command in your terminal to authenticate
+                </p>
               </div>
             </div>
+
+            <div className="bg-neutral-900 dark:bg-black rounded-lg sm:rounded-xl p-3 sm:p-4 mb-2 sm:mb-3">
+              <div className="flex items-center justify-between gap-3">
+                <code className="text-green-400 font-mono text-sm flex-1 break-all">
+                  gcloud auth application-default login
+                </code>
+                <motion.button
+                  onClick={() => handleCopy('gcloud auth application-default login')}
+                  className="p-2 hover:bg-neutral-800 rounded-lg transition-colors flex-shrink-0"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  title={copied ? 'Copied!' : 'Copy command'}
+                >
+                  {copied ? (
+                    <Check className="w-4 h-4 text-green-400" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-neutral-400" />
+                  )}
+                </motion.button>
+              </div>
+            </div>
+
+            <motion.button
+              onClick={openTerminal}
+              className="w-full py-2 sm:py-2.5 px-3 sm:px-4 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              Open Terminal & Authenticate
+            </motion.button>
           </motion.div>
 
           {/* Test Result - Inside Card */}
@@ -698,7 +827,7 @@ function AuthRequiredState({ onRetry, onSkip, authStatus, testing, setTesting })
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300 }}
-                className="mb-8"
+                className="mb-5 sm:mb-6"
               >
                 <div className={`rounded-2xl p-6 border backdrop-blur-xl
                   ${testResult.success
@@ -739,7 +868,7 @@ function AuthRequiredState({ onRetry, onSkip, authStatus, testing, setTesting })
           </AnimatePresence>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -748,19 +877,19 @@ function AuthRequiredState({ onRetry, onSkip, authStatus, testing, setTesting })
             variant="primary"
             size="lg"
             onClick={handleTestAuth}
-            disabled={testing}
-            className="w-full px-6 py-4 text-base font-semibold rounded-2xl shadow-md
+            disabled={testing || authenticating}
+            className="w-full px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg shadow-md
               bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 hover:from-orange-600 hover:via-pink-600 hover:to-purple-700
               border-none disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {testing ? (
               <>
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                Testing Connection...
+                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1.5" />
+                Checking...
               </>
             ) : (
               <>
-                <CheckCircle2 className="w-5 h-5 mr-2" />
+                <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5" />
                 I've Authenticated
               </>
             )}
@@ -775,27 +904,24 @@ function AuthRequiredState({ onRetry, onSkip, authStatus, testing, setTesting })
             variant="ghost"
             size="lg"
             onClick={onSkip}
-            className="w-full px-6 py-4 text-base font-semibold rounded-2xl
+            className="w-full px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg
               bg-white/60 dark:bg-neutral-800/60 backdrop-blur-xl border border-white/40 dark:border-neutral-700/40
               hover:border-pink-300 dark:hover:border-purple-600 shadow-sm"
           >
-            Skip for Now
+            Skip
           </Button>
         </motion.div>
           </div>
 
           {/* Alternative Option */}
-          <div className="text-center mt-6">
-            <p className="text-sm text-neutral-500 dark:text-neutral-500">
-              Don't have Google Cloud?{' '}
-              <button
-                onClick={onSkip}
-                className="font-medium text-pink-600 dark:text-pink-400 hover:text-purple-600
-                  dark:hover:text-purple-400 underline underline-offset-2 transition-colors"
-              >
-                Use OpenAI or Anthropic API keys instead →
-              </button>
-            </p>
+          <div className="text-center mt-3">
+            <button
+              onClick={onSkip}
+              className="text-xs text-pink-600 dark:text-pink-400 hover:text-purple-600
+                dark:hover:text-purple-400 underline underline-offset-2 transition-colors"
+            >
+              Use API keys instead →
+            </button>
           </div>
         </div>
       </motion.div>

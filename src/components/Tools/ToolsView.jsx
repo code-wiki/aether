@@ -62,10 +62,11 @@ function ToolsView({ isMobile, isTablet, selectedTool, onToolChange, triggerNew 
     const tool = ToolsStorage.getTool(deleteConfirm);
     if (tool && tool.type === 'MCP Server') {
       ToolsStorage.deleteMCPServer(deleteConfirm);
-    }
 
-    if (selectedTool?.id === deleteConfirm) {
-      onToolChange?.(null);
+      // Clear selection if the deleted tool was selected
+      if (selectedTool?.id === deleteConfirm) {
+        onToolChange?.(null);
+      }
     }
 
     setDeleteConfirm(null);
@@ -80,7 +81,7 @@ function ToolsView({ isMobile, isTablet, selectedTool, onToolChange, triggerNew 
             <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
               <div className="flex items-start gap-4">
                 {/* Icon */}
-                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center flex-shrink-0 text-3xl">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 text-3xl">
                   {selectedTool.icon || <HiCube className="w-8 h-8 text-white" />}
                 </div>
 
@@ -91,7 +92,7 @@ function ToolsView({ isMobile, isTablet, selectedTool, onToolChange, triggerNew 
                       {selectedTool.name}
                     </h1>
                     {selectedTool.status === 'active' && (
-                      <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium rounded-md">
+                      <span className="px-2 py-1 bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-md">
                         Active
                       </span>
                     )}
@@ -115,7 +116,7 @@ function ToolsView({ isMobile, isTablet, selectedTool, onToolChange, triggerNew 
                         className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 text-sm font-medium ${
                           selectedTool.status === 'active'
                             ? 'bg-neutral-500 text-white hover:bg-neutral-600'
-                            : 'bg-emerald-500 text-white hover:bg-emerald-600'
+                            : 'bg-blue-500 text-white hover:bg-blue-600'
                         }`}
                       >
                         {selectedTool.status === 'active' ? (
@@ -134,7 +135,7 @@ function ToolsView({ isMobile, isTablet, selectedTool, onToolChange, triggerNew 
                     {selectedTool.type === 'MCP Server' && (
                       <button
                         onClick={(e) => handleEdit(selectedTool, e)}
-                        className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center gap-1.5 text-sm font-medium"
+                        className="px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1.5 text-sm font-medium"
                       >
                         <HiPencil className="w-4 h-4" />
                         Configure
@@ -235,8 +236,8 @@ function ToolsView({ isMobile, isTablet, selectedTool, onToolChange, triggerNew 
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
-                <HiCube className="w-12 h-12 text-emerald-500" />
+              <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center">
+                <HiCube className="w-12 h-12 text-blue-500" />
               </div>
               <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
                 Select a tool

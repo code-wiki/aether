@@ -109,7 +109,7 @@ class ToolsStorage {
     }
 
     localStorage.setItem(MCP_SERVERS_STORAGE_KEY, JSON.stringify(servers));
-    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('tools-storage-change'));
 
     return serverData;
   }
@@ -129,7 +129,7 @@ class ToolsStorage {
       };
 
       localStorage.setItem(MCP_SERVERS_STORAGE_KEY, JSON.stringify(servers));
-      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('tools-storage-change'));
       return servers[index];
     }
 
@@ -144,7 +144,9 @@ class ToolsStorage {
     const filtered = servers.filter(s => s.id !== id);
 
     localStorage.setItem(MCP_SERVERS_STORAGE_KEY, JSON.stringify(filtered));
-    window.dispatchEvent(new Event('storage'));
+
+    // Dispatch custom event that works in the same window
+    window.dispatchEvent(new CustomEvent('tools-storage-change'));
   }
 
   /**

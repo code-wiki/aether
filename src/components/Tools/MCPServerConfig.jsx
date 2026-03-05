@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plug, Download, CheckCircle, Settings, Globe, Database, FileText } from 'lucide-react';
+import { X, Plug, Download, CheckCircle, Settings, Globe, Database, FileText, Eye, EyeOff } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import ToolsStorage from '../../services/storage/ToolsStorage';
 
@@ -10,6 +10,7 @@ function MCPServerConfig({ onClose, onInstall, initialServer }) {
   const [view, setView] = useState(initialServer ? 'configure' : 'browse'); // browse | configure
   const [selectedServer, setSelectedServer] = useState(initialServer || null);
   const [config, setConfig] = useState(initialServer?.config || {});
+  const [visiblePasswords, setVisiblePasswords] = useState({});
 
   // Available MCP Servers (marketplace)
   const availableServers = [
@@ -145,7 +146,7 @@ function MCPServerConfig({ onClose, onInstall, initialServer }) {
         <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white shadow-lg">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg">
                 <Plug className="w-5 h-5" />
               </div>
               <div>
@@ -172,7 +173,7 @@ function MCPServerConfig({ onClose, onInstall, initialServer }) {
             <div>
               {/* Categories */}
               <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-                <button className="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-medium whitespace-nowrap">
+                <button className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium whitespace-nowrap">
                   All Servers
                 </button>
                 {categories.map(cat => (
@@ -190,7 +191,7 @@ function MCPServerConfig({ onClose, onInstall, initialServer }) {
                 {availableServers.map(server => (
                   <div
                     key={server.id}
-                    className="p-4 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:border-green-500 dark:hover:border-green-500 transition-all group"
+                    className="p-4 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
                   >
                     <div className="flex items-start gap-3 mb-3">
                       <div className="text-3xl">{server.icon}</div>
@@ -218,7 +219,7 @@ function MCPServerConfig({ onClose, onInstall, initialServer }) {
                     </div>
                     <button
                       onClick={() => handleConfigure(server)}
-                      className="w-full px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+                      className="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all"
                     >
                       Install & Configure
                     </button>
@@ -288,8 +289,36 @@ function MCPServerConfig({ onClose, onInstall, initialServer }) {
                           })}
                           placeholder="One per line"
                           rows={3}
-                          className="w-full px-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm"
+                          className="w-full px-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
                         />
+                      ) : field.type === 'password' ? (
+                        <div className="relative">
+                          <input
+                            type={visiblePasswords[field.name] ? 'text' : 'password'}
+                            value={config[field.name] || ''}
+                            onChange={(e) => setConfig({
+                              ...config,
+                              [field.name]: e.target.value
+                            })}
+                            placeholder="••••••••"
+                            className="w-full px-4 py-2.5 pr-12 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setVisiblePasswords({
+                              ...visiblePasswords,
+                              [field.name]: !visiblePasswords[field.name]
+                            })}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded transition-colors"
+                            title={visiblePasswords[field.name] ? 'Hide' : 'Show'}
+                          >
+                            {visiblePasswords[field.name] ? (
+                              <EyeOff className="w-4 h-4 text-neutral-500" />
+                            ) : (
+                              <Eye className="w-4 h-4 text-neutral-500" />
+                            )}
+                          </button>
+                        </div>
                       ) : (
                         <input
                           type={field.type}
@@ -299,7 +328,7 @@ function MCPServerConfig({ onClose, onInstall, initialServer }) {
                             [field.name]: field.type === 'number' ? parseInt(e.target.value) : e.target.value
                           })}
                           placeholder={field.default?.toString()}
-                          className="w-full px-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       )}
                     </div>
@@ -332,7 +361,7 @@ function MCPServerConfig({ onClose, onInstall, initialServer }) {
               </button>
               <button
                 onClick={handleInstall}
-                className="px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all"
+                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all"
               >
                 Install Server
               </button>

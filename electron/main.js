@@ -206,14 +206,18 @@ ipcMain.handle('shell:exec', async (event, command) => {
 let gcpAuthInstance = null;
 let gcpAccessToken = null;
 let gcpTokenExpiry = null;
+let gcpTokenPromise = null; // Shared promise to deduplicate concurrent requests
 
 /**
  * Helper function to get a valid GCP access token
+ * Automatically handles token refresh via google-auth-library
+ * Deduplicates concurrent requests using a shared promise
  */
 async function getGCPAccessToken(scopes = ['https://www.googleapis.com/auth/cloud-platform']) {
   try {
-    // Check if we have a valid cached token
-    if (gcpAccessToken && gcpTokenExpiry && Date.now() < gcpTokenExpiry) {
+    // Check if we have a valid cached token (5 minute buffer before expiry)
+    if (gcpAccessToken && gcpTokenExpiry && Date.now() < (gcpTokenExpiry - 5 * 60 * 1000)) {
+      // Token is cached, return silently (reduce log noise)
       return {
         success: true,
         token: gcpAccessToken,
@@ -221,33 +225,58 @@ async function getGCPAccessToken(scopes = ['https://www.googleapis.com/auth/clou
       };
     }
 
-    // Dynamically import GoogleAuth (only works in Node.js)
-    const { GoogleAuth } = await import('google-auth-library');
-
-    // Initialize auth if needed
-    if (!gcpAuthInstance) {
-      gcpAuthInstance = new GoogleAuth({ scopes });
+    // If there's already a token request in-flight, wait for it instead of making a new one
+    if (gcpTokenPromise) {
+      return await gcpTokenPromise;
     }
 
-    // Get access token
-    const client = await gcpAuthInstance.getClient();
-    const tokenResponse = await client.getAccessToken();
+    // Create a new promise for this token request
+    gcpTokenPromise = (async () => {
+      try {
+        // Dynamically import GoogleAuth (only works in Node.js)
+        const { GoogleAuth } = await import('google-auth-library');
 
-    if (!tokenResponse.token) {
-      throw new Error('Failed to obtain access token');
-    }
+        // Initialize auth if needed (or if scopes changed)
+        if (!gcpAuthInstance) {
+          console.log('[GCP Auth] Initializing GoogleAuth...');
+          gcpAuthInstance = new GoogleAuth({ scopes });
+        }
 
-    // Cache the token (expires in ~1 hour, refresh 5 min early)
-    gcpAccessToken = tokenResponse.token;
-    gcpTokenExpiry = Date.now() + (55 * 60 * 1000); // 55 minutes
+        // Get access token - this automatically refreshes if expired
+        console.log('[GCP Auth] Requesting new access token...');
+        const client = await gcpAuthInstance.getClient();
+        const tokenResponse = await client.getAccessToken();
 
-    return {
-      success: true,
-      token: tokenResponse.token,
-      cached: false,
-    };
+        if (!tokenResponse.token) {
+          throw new Error('Failed to obtain access token');
+        }
+
+        // Cache the token (google-auth-library returns tokens valid for ~1 hour)
+        // We'll cache it for 55 minutes to be safe
+        gcpAccessToken = tokenResponse.token;
+        gcpTokenExpiry = Date.now() + (55 * 60 * 1000); // 55 minutes
+
+        console.log('[GCP Auth] Successfully obtained access token (expires in ~55 minutes)');
+
+        return {
+          success: true,
+          token: tokenResponse.token,
+          cached: false,
+        };
+      } finally {
+        // Clear the promise once it's resolved/rejected so new requests can be made
+        gcpTokenPromise = null;
+      }
+    })();
+
+    return await gcpTokenPromise;
   } catch (err) {
-    console.error('GCP auth error:', err);
+    console.error('[GCP Auth] Error getting access token:', err.message);
+
+    // Clear cached token on error so we retry next time
+    gcpAccessToken = null;
+    gcpTokenExpiry = null;
+
     return {
       success: false,
       error: err.message || 'Failed to get access token',
@@ -264,6 +293,7 @@ ipcMain.handle('gcp:clear-token-cache', () => {
   gcpAccessToken = null;
   gcpTokenExpiry = null;
   gcpAuthInstance = null;
+  gcpTokenPromise = null;
   return { success: true };
 });
 

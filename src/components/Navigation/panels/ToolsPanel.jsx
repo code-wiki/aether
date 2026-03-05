@@ -19,8 +19,8 @@ function ToolsPanel({ isCollapsed, activeColor = 'blue', onOpenItem, selectedToo
       loadTools();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('tools-storage-change', handleStorageChange);
+    return () => window.removeEventListener('tools-storage-change', handleStorageChange);
   }, []);
 
   const loadTools = () => {

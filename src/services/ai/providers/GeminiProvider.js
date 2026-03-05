@@ -1,4 +1,5 @@
 import BaseProvider from './BaseProvider.js';
+import { isAuthError, handleAuthError } from '../../gcp/authErrorHandler.js';
 
 /**
  * GeminiProvider - Google Gemini via Vertex AI REST API
@@ -101,14 +102,28 @@ class GeminiProvider extends BaseProvider {
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Gemini API error: ${response.status} - ${error}`);
+        const errorText = await response.text();
+        const error = new Error(`Gemini API error: ${response.status} - ${errorText}`);
+        error.status = response.status;
+
+        // Check if this is an auth error
+        if (isAuthError(error)) {
+          handleAuthError(error);
+        }
+
+        throw error;
       }
 
       const data = await response.json();
       return data.candidates[0].content.parts[0].text;
     } catch (error) {
       console.error('GeminiProvider sendMessage error:', error);
+
+      // Check if this is an auth error
+      if (isAuthError(error)) {
+        handleAuthError(error);
+      }
+
       throw error;
     }
   }
@@ -161,8 +176,16 @@ class GeminiProvider extends BaseProvider {
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Gemini API error: ${response.status} - ${error}`);
+        const errorText = await response.text();
+        const error = new Error(`Gemini API error: ${response.status} - ${errorText}`);
+        error.status = response.status;
+
+        // Check if this is an auth error
+        if (isAuthError(error)) {
+          handleAuthError(error);
+        }
+
+        throw error;
       }
 
       const reader = response.body.getReader();
@@ -200,6 +223,12 @@ class GeminiProvider extends BaseProvider {
       }
     } catch (error) {
       console.error('GeminiProvider streamMessage error:', error);
+
+      // Check if this is an auth error
+      if (isAuthError(error)) {
+        handleAuthError(error);
+      }
+
       throw error;
     }
   }

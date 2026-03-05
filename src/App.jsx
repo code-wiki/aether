@@ -33,6 +33,24 @@ function AppContent() {
     }
   }, []);
 
+  // Listen for GCP auth errors from anywhere in the app
+  useEffect(() => {
+    const handleGCPAuthError = (event) => {
+      console.log('[App] GCP auth error detected - signing out user');
+      // Return to welcome screen
+      setShowWelcome(true);
+      setWelcomeCompleted(false);
+      setShowSetupWizard(false);
+      setSetupChecked(false);
+    };
+
+    window.addEventListener('gcp-auth-error', handleGCPAuthError);
+
+    return () => {
+      window.removeEventListener('gcp-auth-error', handleGCPAuthError);
+    };
+  }, []);
+
   // Check if setup is needed on first load
   useEffect(() => {
     if (!isLoading && !setupChecked && welcomeCompleted) {
@@ -43,36 +61,8 @@ function AppContent() {
     }
   }, [isLoading, setupChecked, welcomeCompleted, settings.gcp?.projectId]);
 
-  // Check GCP auth status after setup is complete
-  useEffect(() => {
-    const checkAuth = async () => {
-      // Only check if setup is complete and we have a project ID
-      if (!setupChecked || !settings.gcp?.projectId || showSetupWizard) {
-        return;
-      }
-
-      try {
-        const status = await checkAuthStatus();
-        setAuthStatus(status);
-
-        // Show modal if auth is invalid or expired
-        if (!status.valid) {
-          console.log('[App] Auth check failed:', status.message);
-          setShowAuthModal(true);
-        }
-      } catch (error) {
-        console.error('[App] Error checking auth status:', error);
-      }
-    };
-
-    // Check on mount
-    checkAuth();
-
-    // Re-check every 30 minutes
-    const interval = setInterval(checkAuth, 30 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, [setupChecked, settings.gcp?.projectId, showSetupWizard]);
+  // Auth errors are handled automatically during API calls via authErrorHandler
+  // No need for background checks - we rely on real-time error detection
 
   // Show welcome screen on first launch
   if (showWelcome && !welcomeCompleted) {

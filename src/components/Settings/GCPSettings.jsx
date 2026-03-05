@@ -8,9 +8,12 @@ import {
   Copy,
   ExternalLink,
   Info,
+  LogIn,
 } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import { detectADC, checkGCloudInstalled, getSetupInstructions, GCP_LOCATIONS } from '../../services/gcp/auth';
+import { startGUIAuthentication, waitForCredentials } from '../../services/gcp/oauth';
+import { testAuthConnection } from '../../services/gcp/authStatus';
 import { Button, Input, Badge, Card } from '../../design-system/primitives';
 import { fadeInUp } from '../../design-system/motion';
 
@@ -31,6 +34,8 @@ const GCPSettings = () => {
   const [gcloudInstalled, setGcloudInstalled] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [authenticating, setAuthenticating] = useState(false);
+  const [authProgress, setAuthProgress] = useState(null);
 
   // Auto-detect on mount
   useEffect(() => {
@@ -79,6 +84,78 @@ const GCPSettings = () => {
     navigator.clipboard.writeText(command);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleGUIAuthentication = async () => {
+    setAuthenticating(true);
+    setAuthProgress('Opening browser for authentication...');
+    setError(null);
+
+    try {
+      // Start the OAuth flow
+      const authResult = await startGUIAuthentication();
+
+      if (!authResult.success) {
+        setError({
+          error: authResult.error || 'Failed to start authentication',
+          instructions: 'Please make sure gcloud CLI is installed and try again',
+        });
+        setAuthenticating(false);
+        setAuthProgress(null);
+        return;
+      }
+
+      setAuthProgress('Waiting for you to complete authentication in your browser...');
+
+      // Wait for credentials to be saved
+      const waitResult = await waitForCredentials(120000); // 2 minute timeout
+
+      if (waitResult.success) {
+        setAuthProgress('Authentication successful! Verifying...');
+
+        // Test the connection
+        const testResult = await testAuthConnection();
+
+        if (testResult.success) {
+          // Re-detect credentials to update UI
+          await detectCredentials();
+          setAuthProgress('Successfully authenticated!');
+
+          // Clear progress after delay
+          setTimeout(() => {
+            setAuthProgress(null);
+          }, 3000);
+        } else {
+          setError({
+            error: 'Authentication completed but verification failed',
+            instructions: 'Please try again or check your credentials',
+          });
+          setStatus('error');
+        }
+      } else if (waitResult.timeout) {
+        setError({
+          error: 'Authentication timeout',
+          instructions: 'Please complete the process in your browser and click "Re-check"',
+        });
+        setStatus('error');
+      } else {
+        setError({
+          error: 'Failed to detect credentials',
+          instructions: 'Please try again or use the terminal method',
+        });
+        setStatus('error');
+      }
+
+    } catch (error) {
+      setError({
+        error: error.message || 'Authentication failed',
+        instructions: 'Please try again or use the terminal method',
+      });
+      setStatus('error');
+    } finally {
+      setAuthenticating(false);
+      setAuthProgress(null);
+    }
   };
 
   const setupInstructions = getSetupInstructions();
@@ -182,7 +259,7 @@ const GCPSettings = () => {
           </AnimatePresence>
         )}
 
-        {/* Error: Show instructions */}
+        {/* Error: Show instructions and GUI auth button */}
         {status === 'error' && error && (
           <AnimatePresence>
             <motion.div {...fadeInUp} className="space-y-3">
@@ -193,7 +270,7 @@ const GCPSettings = () => {
                     <p className="text-sm font-medium text-red-900 dark:text-red-100">
                       {error.error}
                     </p>
-                    {error.instructions && (
+                    {error.instructions && !error.instructions.startsWith('Please') && (
                       <div className="mt-2 flex items-center gap-2">
                         <code className="text-xs bg-red-100 dark:bg-red-900/40 px-2 py-1 rounded font-mono text-red-900 dark:text-red-100 flex-1">
                           {error.instructions}
@@ -214,6 +291,46 @@ const GCPSettings = () => {
                   </div>
                 </div>
               </div>
+
+              {/* GUI Authentication Button */}
+              {gcloudInstalled?.installed && (
+                <div className="p-3 bg-gradient-to-r from-pink-50 to-orange-50 dark:from-pink-900/20 dark:to-orange-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
+                  <div className="flex items-start gap-2">
+                    <LogIn className="w-4 h-4 text-pink-600 dark:text-pink-400 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-pink-900 dark:text-pink-100">
+                        Authenticate with Google
+                      </p>
+                      <p className="text-xs text-pink-700 dark:text-pink-300 mt-1">
+                        Sign in with your Google account to authenticate
+                      </p>
+                      <button
+                        onClick={handleGUIAuthentication}
+                        disabled={authenticating}
+                        className="mt-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-orange-600 hover:from-pink-700 hover:to-orange-700 text-white rounded-lg font-medium text-xs transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {authenticating ? (
+                          <>
+                            <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Authenticating...
+                          </>
+                        ) : (
+                          <>
+                            <LogIn className="w-3 h-3" />
+                            Sign in with Google
+                          </>
+                        )}
+                      </button>
+                      {authProgress && (
+                        <p className="text-xs text-pink-600 dark:text-pink-400 mt-2 flex items-center gap-2">
+                          <div className="w-3 h-3 border-2 border-pink-600 border-t-transparent rounded-full animate-spin" />
+                          {authProgress}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
         )}

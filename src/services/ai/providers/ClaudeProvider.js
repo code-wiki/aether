@@ -1,4 +1,5 @@
 import BaseProvider from './BaseProvider.js';
+import { isAuthError, handleAuthError } from '../../gcp/authErrorHandler.js';
 
 /**
  * ClaudeProvider - Anthropic Claude via Vertex AI
@@ -114,14 +115,28 @@ class ClaudeProvider extends BaseProvider {
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Claude API error: ${response.status} - ${error}`);
+        const errorText = await response.text();
+        const error = new Error(`Claude API error: ${response.status} - ${errorText}`);
+        error.status = response.status;
+
+        // Check if this is an auth error
+        if (isAuthError(error)) {
+          handleAuthError(error);
+        }
+
+        throw error;
       }
 
       const data = await response.json();
       return data.content[0].text;
     } catch (error) {
       console.error('ClaudeProvider sendMessage error:', error);
+
+      // Check if this is an auth error
+      if (isAuthError(error)) {
+        handleAuthError(error);
+      }
+
       throw error;
     }
   }
@@ -174,8 +189,16 @@ class ClaudeProvider extends BaseProvider {
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Claude API error: ${response.status} - ${error}`);
+        const errorText = await response.text();
+        const error = new Error(`Claude API error: ${response.status} - ${errorText}`);
+        error.status = response.status;
+
+        // Check if this is an auth error
+        if (isAuthError(error)) {
+          handleAuthError(error);
+        }
+
+        throw error;
       }
 
       const reader = response.body.getReader();
@@ -262,6 +285,12 @@ class ClaudeProvider extends BaseProvider {
       }
     } catch (error) {
       console.error('ClaudeProvider streamMessage error:', error);
+
+      // Check if this is an auth error
+      if (isAuthError(error)) {
+        handleAuthError(error);
+      }
+
       throw error;
     }
   }

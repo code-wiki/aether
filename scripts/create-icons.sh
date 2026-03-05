@@ -15,20 +15,13 @@ fi
 mkdir -p build/icons
 mkdir -p build/icon.iconset
 
-# Source icon (you'll need to create this as a 1024x1024 PNG)
-SOURCE_ICON="public/logo.svg"
+# Source icon - Aether logo
+SOURCE_ICON="public/logos/aether-logo.png"
 
 # Check if source exists
 if [ ! -f "$SOURCE_ICON" ]; then
-    echo "Creating placeholder icon..."
-    # Create a simple placeholder icon
-    convert -size 1024x1024 xc:#00D4FF \
-            -gravity center \
-            -pointsize 400 \
-            -fill white \
-            -annotate +0+0 "A" \
-            build/icon-1024.png
-    SOURCE_ICON="build/icon-1024.png"
+    echo "Error: Source icon not found at $SOURCE_ICON"
+    exit 1
 fi
 
 echo "Generating macOS icons..."

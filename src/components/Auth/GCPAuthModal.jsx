@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Terminal, Copy, Check, AlertCircle, CheckCircle2, ExternalLink } from 'lucide-react';
+import { X, Terminal, Copy, Check, AlertCircle, CheckCircle2, ExternalLink, LogIn } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { getAuthInstructions, testAuthConnection } from '../../services/gcp/authStatus';
+import { startGUIAuthentication, waitForCredentials, checkGCloudAvailable } from '../../services/gcp/oauth';
 
 /**
  * GCPAuthModal - Modal for handling expired Google Cloud authentication
@@ -12,8 +13,20 @@ function GCPAuthModal({ isOpen, onClose, onAuthSuccess, authStatus }) {
   const [copied, setCopied] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
+  const [authenticating, setAuthenticating] = useState(false);
+  const [authProgress, setAuthProgress] = useState(null);
+  const [gcloudAvailable, setGcloudAvailable] = useState(null);
 
   const instructions = getAuthInstructions();
+
+  // Check if gcloud is available when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      checkGCloudAvailable().then(result => {
+        setGcloudAvailable(result.available);
+      });
+    }
+  }, [isOpen]);
 
   const handleCopy = async (text) => {
     try {
@@ -47,6 +60,75 @@ function GCPAuthModal({ isOpen, onClose, onAuthSuccess, authStatus }) {
       });
     } finally {
       setTesting(false);
+    }
+  };
+
+  const handleGUIAuthentication = async () => {
+    setAuthenticating(true);
+    setAuthProgress('Opening browser for authentication...');
+    setTestResult(null);
+
+    try {
+      // Start the OAuth flow
+      const authResult = await startGUIAuthentication();
+
+      if (!authResult.success) {
+        setTestResult({
+          success: false,
+          message: authResult.error || 'Failed to start authentication'
+        });
+        setAuthenticating(false);
+        return;
+      }
+
+      setAuthProgress('Waiting for you to complete authentication in your browser...');
+
+      // Wait for credentials to be saved
+      const waitResult = await waitForCredentials(120000); // 2 minute timeout
+
+      if (waitResult.success) {
+        setAuthProgress('Authentication successful! Verifying...');
+
+        // Test the connection
+        const testResult = await testAuthConnection();
+
+        if (testResult.success) {
+          setTestResult({
+            success: true,
+            message: 'Successfully authenticated with Google Cloud!'
+          });
+
+          // Close modal after brief delay
+          setTimeout(() => {
+            onAuthSuccess?.();
+            onClose();
+          }, 1500);
+        } else {
+          setTestResult({
+            success: false,
+            message: 'Authentication completed but verification failed. Please try again.'
+          });
+        }
+      } else if (waitResult.timeout) {
+        setTestResult({
+          success: false,
+          message: 'Authentication timeout. Please complete the process in your browser and click "I\'ve Authenticated".'
+        });
+      } else {
+        setTestResult({
+          success: false,
+          message: 'Failed to detect credentials. Please try again or use terminal method.'
+        });
+      }
+
+    } catch (error) {
+      setTestResult({
+        success: false,
+        message: error.message || 'Authentication failed'
+      });
+    } finally {
+      setAuthenticating(false);
+      setAuthProgress(null);
     }
   };
 
@@ -109,6 +191,87 @@ function GCPAuthModal({ isOpen, onClose, onAuthSuccess, authStatus }) {
 
             {/* Content */}
             <div className="p-6 space-y-6">
+              {/* GUI Authentication Button - Primary Method */}
+              {gcloudAvailable && (
+                <div className="p-4 bg-gradient-to-r from-pink-50 to-orange-50 dark:from-pink-900/20 dark:to-orange-900/20 border border-pink-200 dark:border-pink-800 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <LogIn className="w-5 h-5 text-pink-600 dark:text-pink-400 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-medium text-pink-900 dark:text-pink-100">
+                        Authenticate with Google (Recommended)
+                      </p>
+                      <p className="text-sm text-pink-700 dark:text-pink-300 mt-1">
+                        Click the button below to sign in with your Google account. Your browser will open automatically.
+                      </p>
+                      <button
+                        onClick={handleGUIAuthentication}
+                        disabled={authenticating || testing}
+                        className={cn(
+                          'mt-3 px-6 py-2.5 bg-gradient-to-r from-pink-600 to-orange-600 hover:from-pink-700 hover:to-orange-700 text-white rounded-lg font-medium text-sm transition-all flex items-center gap-2 shadow-lg',
+                          (authenticating || testing) && 'opacity-50 cursor-not-allowed'
+                        )}
+                      >
+                        {authenticating ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Authenticating...
+                          </>
+                        ) : (
+                          <>
+                            <LogIn className="w-4 h-4" />
+                            Sign in with Google
+                          </>
+                        )}
+                      </button>
+                      {authProgress && (
+                        <p className="text-sm text-pink-600 dark:text-pink-400 mt-2 flex items-center gap-2">
+                          <div className="w-3 h-3 border-2 border-pink-600 border-t-transparent rounded-full animate-spin" />
+                          {authProgress}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* gcloud CLI not available warning */}
+              {gcloudAvailable === false && (
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-medium text-yellow-900 dark:text-yellow-100">
+                        gcloud CLI not installed
+                      </p>
+                      <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                        To use GUI authentication, please install the Google Cloud SDK first.
+                      </p>
+                      <a
+                        href="https://cloud.google.com/sdk/docs/install"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1 text-sm text-yellow-600 dark:text-yellow-400 hover:underline"
+                      >
+                        Download Google Cloud SDK
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-neutral-200 dark:border-neutral-800" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white dark:bg-neutral-900 text-neutral-500 dark:text-neutral-400">
+                    Or use terminal method
+                  </span>
+                </div>
+              </div>
+
               {/* Instructions */}
               <div className="space-y-4">
                 {instructions.steps.map((step) => (
